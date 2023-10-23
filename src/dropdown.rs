@@ -1,3 +1,4 @@
+use web_sys::{EventTarget, HtmlSelectElement};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -5,50 +6,37 @@ pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
     pub items: Vec<T>,
     pub updated: Callback<T>,
     #[prop_or("Select".to_string())]
-    pub prompt: String,
+    pub label: String,
 }
 
 #[function_component]
 pub fn Dropdown<T: Copy + PartialEq + ToString + 'static>(properties: &DropdownProperties<T>) -> Html {
-    let active: UseStateHandle<bool> = use_state_eq(|| false);
-    let active_true: Callback<FocusEvent> = {
-        let active: UseStateHandle<bool> = active.clone();
-        Callback::from(move |_| active.set(true))
-    };
-    let active_false: Callback<FocusEvent> = {
-        let active: UseStateHandle<bool> = active.clone();
-        Callback::from(move |_| active.set(false))
-    };
-
     let selected: UseStateHandle<Option<T>> = use_state_eq(|| None);
+    let selected_change: Callback<Event> = {
+        let selected: UseStateHandle<Option<T>> = selected.clone();
+        let items: Vec<T> = properties.items.clone();
+        let updated: Callback<T> = properties.updated.clone();
+        Callback::from(move |event: Event| {
+            let index: i32 = event.target_unchecked_into::<HtmlSelectElement>().selected_index();
+            if index > 0i32 {
+                updated.emit(*items.get(index as usize - 1usize).unwrap());
+            };
+        })
+    };
 
     html!(
         <div class="field">
-            <div class={ if *active { "dropdown is-active" } else { "dropdown" } }>
-                <div class="control">
-                    <div class="dropdown-trigger">
-                        <button class="button is-justify-content-space-between" onfocus={ active_true } onblur={ active_false }>
-                            <span>{ match &*selected { Some(selected) => selected.to_string(), None => properties.prompt.clone() } }</span>
-                            <span class="material-symbols-outlined">{ "expand_more" }</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="dropdown-menu" style="width:100%">
-                    <div class="dropdown-content">
+            <label class="label">{ properties.label.clone() }</label>
+            <div class="control">
+                <div class="select">
+                    <select onchange={ selected_change }>
+                        <option disabled=true hidden=true selected=true>{ properties.label.clone() }</option>
                         {
                             properties.items.iter().map(|item| {
-                                let selected: UseStateHandle<Option<T>> = selected.clone();
-                                let updated: Callback<T> = properties.updated.clone();
-                                let item: T = *item;
-                                html!{
-                                    <a class="dropdown-item" onmousedown={ Callback::<MouseEvent>::from(move |_| {
-                                        selected.set(Some(item));
-                                        updated.emit(item);
-                                    }) }>{ item.to_string() }</a>
-                                }
+                                html!(<option>{ item.to_string() }</option>)
                             }).collect::<Html>()
                         }
-                    </div>
+                    </select>
                 </div>
             </div>
         </div>
