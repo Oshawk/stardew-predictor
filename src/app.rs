@@ -1,4 +1,5 @@
 use crate::dropdown::Dropdown;
+use crate::input::Input;
 use yew::prelude::*;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -19,6 +20,9 @@ impl ToString for Test {
 #[function_component]
 pub fn App() -> Html {
     html!(
-        <Dropdown<Test> items={ vec![Test::A, Test::B] } updated={ Callback::<Test>::from(|_| {}) }/>
+        <>
+            <Dropdown<Test> items={ vec![Test::A, Test::B] } updated={ Callback::<Option<Test>>::from(|_| {}) }/>
+            <Input<i32> updated={ Callback::<Option<i32>>::from(|_| {}) }/>
+        </>
     )
 }

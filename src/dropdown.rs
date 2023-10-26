@@ -4,7 +4,7 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
     pub items: Vec<T>,
-    pub updated: Callback<T>,
+    pub updated: Callback<Option<T>>,
     #[prop_or("Select".to_string())]
     pub label: String,
 }
@@ -13,11 +13,13 @@ pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
 pub fn Dropdown<T: Copy + PartialEq + ToString + 'static>(properties: &DropdownProperties<T>) -> Html {
     let selected_change: Callback<Event> = {
         let items: Vec<T> = properties.items.clone();
-        let updated: Callback<T> = properties.updated.clone();
+        let updated: Callback<Option<T>> = properties.updated.clone();
         Callback::from(move |event: Event| {
             let index: i32 = event.target_unchecked_into::<HtmlSelectElement>().selected_index();
             if index > 0i32 {
-                updated.emit(*items.get(index as usize - 1usize).unwrap());
+                updated.emit(Some(*items.get(index as usize - 1usize).unwrap()));
+            } else {
+                updated.emit(None);
             };
         })
     };
