@@ -11,9 +11,7 @@ pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
 
 #[function_component]
 pub fn Dropdown<T: Copy + PartialEq + ToString + 'static>(properties: &DropdownProperties<T>) -> Html {
-    let selected: UseStateHandle<Option<T>> = use_state_eq(|| None);
     let selected_change: Callback<Event> = {
-        let selected: UseStateHandle<Option<T>> = selected.clone();
         let items: Vec<T> = properties.items.clone();
         let updated: Callback<T> = properties.updated.clone();
         Callback::from(move |event: Event| {
