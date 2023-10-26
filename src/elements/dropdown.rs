@@ -1,4 +1,4 @@
-use web_sys::{EventTarget, HtmlSelectElement};
+use web_sys::{HtmlSelectElement};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

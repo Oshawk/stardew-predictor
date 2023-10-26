@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use web_sys::{EventTarget, HtmlInputElement, HtmlSelectElement};
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
