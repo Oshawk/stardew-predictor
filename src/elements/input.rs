@@ -21,7 +21,7 @@ pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(properties: &In
                 Ok(value_) => {
                     value.set(Some(value_));
                 }
-                Err(a) => {
+                Err(_) => {
                     if value_string != "-" {
                         value.set(None);
                     }

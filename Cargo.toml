@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0"
 web-sys = { version="0.3", features=["HtmlInputElement", "HtmlSelectElement"] }
 yew = { version="0.21", features=["csr"] }
