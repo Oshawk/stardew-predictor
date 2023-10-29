@@ -5,8 +5,8 @@ use yew::prelude::*;
 pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
     pub items: Vec<T>,
     pub updated: Callback<Option<T>>,
-    #[prop_or("Select".to_string())]
-    pub label: String,
+    #[prop_or(AttrValue::from("Dropdown"))]
+    pub label: AttrValue,
 }
 
 #[function_component]

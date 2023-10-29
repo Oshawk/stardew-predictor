@@ -30,9 +30,9 @@ pub struct MessageProperties {
     #[prop_or(MessageColour::INFO)]
     pub colour: MessageColour,
     #[prop_or(None)]
-    pub header: Option<String>,
+    pub header: Option<AttrValue>,
     #[prop_or(None)]
-    pub body: Option<String>,
+    pub body: Option<AttrValue>,
 }
 
 #[function_component]

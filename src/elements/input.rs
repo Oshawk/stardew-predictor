@@ -6,8 +6,8 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct InputProperties<T: Copy + FromStr + PartialEq + ToString + 'static> {
     pub updated: Callback<Option<T>>,
-    #[prop_or("Input".to_string())]
-    pub label: String,
+    #[prop_or(AttrValue::from("Input"))]
+    pub label: AttrValue,
 }
 
 #[function_component]

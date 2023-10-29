@@ -16,30 +16,37 @@ pub struct ConfigurationFormProperties {
 #[function_component]
 pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
     let platform: Rc<RefCell<Option<Platform>>> = use_mut_ref(|| None);
-    let platform_updated: Callback<Option<Platform>> = {
-        let platform: Rc<RefCell<Option<Platform>>> = platform.clone();
-        Callback::from(move |platform_: Option<Platform>| {
+    let platform_updated: Callback<Option<Platform>>= use_callback(
+        platform.clone(),
+        move |platform_: Option<Platform>, platform: &Rc<RefCell<Option<Platform>>>| {
             *platform.borrow_mut() = platform_;
             // platform.replace(platform_);
-        })
-    };
+        },
+    );
 
     let seed: Rc<RefCell<Option<i32>>> = use_mut_ref(|| None);
-    let seed_updated: Callback<Option<i32>> = {
-        let seed: Rc<RefCell<Option<i32>>> = seed.clone();
-        Callback::from(move |seed_: Option<i32>| {
+    let seed_updated: Callback<Option<i32>> = use_callback(
+        seed.clone(),
+        move |seed_: Option<i32>, seed: &Rc<RefCell<Option<i32>>>| {
             *seed.borrow_mut() = seed_;
             // seed.replace(seed_);
-        })
-    };
+        },
+    );
 
     let message: UseStateHandle<Option<String>> = use_state_eq(|| None);
-    let button_updated: Callback<()> = {
-        let platform: Rc<RefCell<Option<Platform>>> = platform.clone();
-        let seed: Rc<RefCell<Option<i32>>> = seed.clone();
-        let message: UseStateHandle<Option<String>> = message.clone();
-        let updated: Callback<Configuration> = properties.updated.clone();
-        Callback::from(move |_: ()| {
+    let button_updated: Callback<()> = use_callback(
+        (
+            platform.clone(),
+            seed.clone(),
+            message.clone(),
+            properties.updated.clone(),
+        ),
+        move |_: (), (platform, seed, message, updated): &(
+            Rc<RefCell<Option<Platform>>>,
+            Rc<RefCell<Option<i32>>>,
+            UseStateHandle<Option<String>>,
+            Callback<Configuration>,
+        )| {
             match (*platform.borrow(), *seed.borrow()) {
                 (Some(platform), Some(seed)) => {
                     updated.emit(Configuration { platform, seed });
@@ -49,8 +56,8 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
                     message.set(Some("Platform and seed must be set.".to_string()));
                 }
             }
-        })
-    };
+        },
+    );
 
     html!(
         <div class="section">
