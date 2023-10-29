@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -10,9 +9,9 @@ pub struct ButtonProperties {
 
 #[function_component]
 pub fn Button(properties: &ButtonProperties) -> Html {
-    let clicked: Callback<MouseEvent> = {
+    let button_updated: Callback<MouseEvent> = {
         let updated: Callback<()> = properties.updated.clone();
-        Callback::from(move |event: MouseEvent| {
+        Callback::from(move |_: MouseEvent| {
             updated.emit(());
         })
     };
@@ -20,7 +19,7 @@ pub fn Button(properties: &ButtonProperties) -> Html {
     html!(
         <div class="field">
             <div class="control">
-                <button class="button" onclick={ clicked }>{ properties.label.clone() }</button>
+                <button class="button" onclick={ button_updated }>{ properties.label.clone() }</button>
             </div>
         </div>
     )

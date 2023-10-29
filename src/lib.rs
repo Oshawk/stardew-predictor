@@ -1,2 +1,5 @@
 pub mod app;
-pub mod elements;
+mod compounds;
+mod configuration;
+mod elements;
+mod prng;

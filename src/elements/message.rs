@@ -37,7 +37,6 @@ pub struct MessageProperties {
 
 #[function_component]
 pub fn Message(properties: &MessageProperties) -> Html {
-
     html!(
         <article class={ classes!("message", properties.colour.to_string()) }>
             {

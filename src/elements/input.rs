@@ -1,4 +1,5 @@
 use std::str::FromStr;
+
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
@@ -11,23 +12,23 @@ pub struct InputProperties<T: Copy + FromStr + PartialEq + ToString + 'static> {
 
 #[function_component]
 pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(properties: &InputProperties<T>) -> Html {
-    let value: UseStateHandle<Option<T>> = use_state(|| None);
-    let value_change: Callback<InputEvent> = {
-        let value: UseStateHandle<Option<T>> = value.clone();
+    let value: UseForceUpdateHandle = use_force_update();
+    let value_updated: Callback<InputEvent> = {
+        let value: UseForceUpdateHandle = value.clone();
         let updated: Callback<Option<T>> = properties.updated.clone();
         Callback::from(move |event: InputEvent| {
             let value_string: String = event.target_unchecked_into::<HtmlInputElement>().value();
             match value_string.parse::<T>() {
                 Ok(value_) => {
-                    value.set(Some(value_));
+                    updated.emit(Some(value_));
                 }
                 Err(_) => {
+                    updated.emit(None);
                     if value_string != "-" {
-                        value.set(None);
+                        value.force_update();
                     }
                 }
             }
-            updated.emit(*value);
         })
     };
 
@@ -35,7 +36,7 @@ pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(properties: &In
         <div class="field">
             <label class="label">{ properties.label.clone() }</label>
             <div class="control">
-                <input class="input" oninput={ value_change } placeholder={ properties.label.clone() } type="text" value={ match *value { Some(value) => value.to_string(), None => "".to_string() } }/>
+                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value=""/>
             </div>
         </div>
     )
