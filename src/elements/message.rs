@@ -2,32 +2,32 @@ use yew::prelude::*;
 
 #[derive(PartialEq)]
 pub enum MessageColour {
-    DARK,
-    PRIMARY,
-    LINK,
-    INFO,
-    SUCCESS,
-    WARNING,
-    DANGER,
+    Dark,
+    Primary,
+    Link,
+    Info,
+    Success,
+    Warning,
+    Danger,
 }
 
 impl ToString for MessageColour {
     fn to_string(&self) -> String {
         match self {
-            MessageColour::DARK => "is-dark",
-            MessageColour::PRIMARY => "is-primary",
-            MessageColour::LINK => "is-link",
-            MessageColour::INFO => "is-info",
-            MessageColour::SUCCESS => "is-success",
-            MessageColour::WARNING => "is-warning",
-            MessageColour::DANGER => "is-danger",
+            MessageColour::Dark => "is-dark",
+            MessageColour::Primary => "is-primary",
+            MessageColour::Link => "is-link",
+            MessageColour::Info => "is-info",
+            MessageColour::Success => "is-success",
+            MessageColour::Warning => "is-warning",
+            MessageColour::Danger => "is-danger",
         }.to_string()
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct MessageProperties {
-    #[prop_or(MessageColour::INFO)]
+    #[prop_or(MessageColour::Info)]
     pub colour: MessageColour,
     #[prop_or(None)]
     pub header: Option<AttrValue>,

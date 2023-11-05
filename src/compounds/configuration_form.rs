@@ -20,7 +20,6 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         platform.clone(),
         move |platform_: Option<Platform>, platform: &Rc<RefCell<Option<Platform>>>| {
             *platform.borrow_mut() = platform_;
-            // platform.replace(platform_);
         },
     );
 
@@ -29,7 +28,6 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         seed.clone(),
         move |seed_: Option<i32>, seed: &Rc<RefCell<Option<i32>>>| {
             *seed.borrow_mut() = seed_;
-            // seed.replace(seed_);
         },
     );
 
@@ -49,7 +47,7 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         )| {
             match (*platform.borrow(), *seed.borrow()) {
                 (Some(platform), Some(seed)) => {
-                    updated.emit(Configuration { platform, seed });
+                    updated.emit(Configuration { platform, seed, date: None });
                     message.set(None);
                 }
                 _ => {
@@ -60,19 +58,19 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
     );
 
     html!(
-        <div class="section">
-            <section class="section">
-                <h1 class="title">{ "Configuration" }</h1>
-                <div class="columns">
-                    <div class="column">
-                        <Dropdown<Platform> items={ vec![Platform::SWITCH] } updated={ platform_updated } label="Platform"/>
-                        <Input<i32> updated={ seed_updated } label="Seed"/>
-                        <Button updated={ button_updated } label="Go"/>
+        <section class="section">
+            <h1 class="title">{ "Configuration" }</h1>
+            <div class="container">
+                    <div class="columns">
+                        <div class="column">
+                            <Dropdown<Platform> items={ vec![Platform::PC, Platform::Switch] } updated={ platform_updated } label="Platform" />
+                            <Input<i32> updated={ seed_updated } label="Seed" />
+                            <Button updated={ button_updated } label="Go" />
+                        </div>
+                        <div class="column"></div>
                     </div>
-                    <div class="column"></div>
-                </div>
-                <Message colour={ MessageColour::DANGER } body={ (*message).clone() }/>
-            </section>
-        </div>
+                    <Message colour={ MessageColour::Danger } body={ (*message).clone() } />
+            </div>
+        </section>
     )
 }

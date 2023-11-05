@@ -36,7 +36,7 @@ pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(properties: &In
         <div class="field">
             <label class="label">{ properties.label.clone() }</label>
             <div class="control">
-                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value=""/>
+                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value="" />
             </div>
         </div>
     )
