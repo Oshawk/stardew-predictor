@@ -7,6 +7,18 @@ pub struct ObjectInformation {
     pub description: &'static str,
 }
 
+pub struct BigCraftablesInformation {
+    pub name: &'static str,
+    pub price: u16,
+    pub edibility: i16,
+    pub type_and_category: &'static str,
+    pub description: &'static str,
+    pub can_be_set_outdoors: bool,
+    pub can_be_set_indoors: bool,
+    pub fragility: u8,
+    pub display_name: &'static str,
+}
+
 include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 pub static OFF_LIMIT: phf::Set<u16> = phf::phf_set!(

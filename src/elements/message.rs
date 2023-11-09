@@ -21,7 +21,8 @@ impl ToString for MessageColour {
             MessageColour::Success => "is-success",
             MessageColour::Warning => "is-warning",
             MessageColour::Danger => "is-danger",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 

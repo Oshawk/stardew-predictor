@@ -16,7 +16,7 @@ pub struct ConfigurationFormProperties {
 #[function_component]
 pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
     let platform: Rc<RefCell<Option<Platform>>> = use_mut_ref(|| None);
-    let platform_updated: Callback<Option<Platform>>= use_callback(
+    let platform_updated: Callback<Option<Platform>> = use_callback(
         platform.clone(),
         move |platform_: Option<Platform>, platform: &Rc<RefCell<Option<Platform>>>| {
             *platform.borrow_mut() = platform_;
@@ -39,7 +39,8 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
             message.clone(),
             properties.updated.clone(),
         ),
-        move |_: (), (platform, seed, message, updated): &(
+        move |_: (),
+              (platform, seed, message, updated): &(
             Rc<RefCell<Option<Platform>>>,
             Rc<RefCell<Option<i32>>>,
             UseStateHandle<Option<String>>,
@@ -47,7 +48,11 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         )| {
             match (*platform.borrow(), *seed.borrow()) {
                 (Some(platform), Some(seed)) => {
-                    updated.emit(Configuration { platform, seed, date: None });
+                    updated.emit(Configuration {
+                        platform,
+                        seed,
+                        date: None,
+                    });
                     message.set(None);
                 }
                 _ => {
@@ -61,15 +66,15 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         <section class="section">
             <h1 class="title">{ "Configuration" }</h1>
             <div class="container">
-                    <div class="columns">
-                        <div class="column">
-                            <Dropdown<Platform> items={ vec![Platform::PC, Platform::Switch] } updated={ platform_updated } label="Platform" />
-                            <Input<i32> updated={ seed_updated } label="Seed" />
-                            <Button updated={ button_updated } label="Go" />
-                        </div>
-                        <div class="column"></div>
+                <div class="columns">
+                    <div class="column">
+                        <Dropdown<Platform> items={ vec![Platform::PC, Platform::Switch] } updated={ platform_updated } label="Platform" />
+                        <Input<i32> updated={ seed_updated } label="Seed" />
+                        <Button updated={ button_updated } label="Go" />
                     </div>
-                    <Message colour={ MessageColour::Danger } body={ (*message).clone() } />
+                    <div class="column"></div>
+                </div>
+                <Message colour={ MessageColour::Danger } body={ (*message).clone() } />
             </div>
         </section>
     )

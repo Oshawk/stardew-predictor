@@ -1,13 +1,8 @@
 use yew::prelude::*;
 
 use crate::compounds::configuration_form::ConfigurationForm;
-use crate::compounds::table::{Table, TableCell, TableValue};
 use crate::configuration::Configuration;
-use crate::elements::button::Button;
-use crate::elements::dropdown::Dropdown;
-use crate::elements::input::Input;
-use crate::elements::message::{Message, MessageColour};
-use crate::implementations::traveling_cart::traveling_cart;
+use crate::implementations::traveling_cart::TravelingCart;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Test {
@@ -29,7 +24,8 @@ pub fn App() -> Html {
     let configuration: UseStateHandle<Option<Configuration>> = use_state_eq(|| None);
     let configuration_form_updated = use_callback(
         configuration.clone(),
-        move |configuration_: Configuration, configuration: &UseStateHandle<Option<Configuration>>| {
+        move |configuration_: Configuration,
+              configuration: &UseStateHandle<Option<Configuration>>| {
             configuration.set(Some(configuration_));
         },
     );
@@ -51,7 +47,7 @@ pub fn App() -> Html {
                         <section class="section">
                             <h1 class="title">{ "Results" }</h1>
                             <div class="container">
-                                <Table header={ vec!() } body={ traveling_cart(&configuration, None, &"".to_string()).unwrap() } />
+                                <TravelingCart configuration={ configuration.clone() } />
                             </div>
                         </section>
                     ),

@@ -5,8 +5,8 @@ use anyhow::{bail, Result};
 
 pub trait Prng {
     fn from_seed(seed: i32) -> Result<Self>
-        where
-            Self: Sized;
+    where
+        Self: Sized;
     fn gen_range(&mut self, range: Range<i32>) -> Result<i32>;
     fn gen_float(&mut self) -> Result<f64>;
 }

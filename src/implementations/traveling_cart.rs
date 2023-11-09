@@ -12,18 +12,22 @@
 
 use std::cmp::max;
 use std::collections::HashSet;
-use std::fmt::format;
-use anyhow::{bail, Result};
-use yew::AttrValue;
 
-use crate::codegen::{OBJECT_INFORMATION, ObjectInformation, OFF_LIMIT};
+use anyhow::Result;
+use yew::prelude::*;
+
+use crate::codegen::{
+    ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OFF_LIMIT,
+};
+use crate::compounds::stock_table::{StockTable, StockTableTrait};
+use crate::compounds::table::TableCell;
 use crate::configuration::{Configuration, Platform};
-use crate::compounds::table::{TableAlign, TableCell, TableProperties, TableValue};
-use crate::implementations::util::{stock_items_rows, StockItem};
+use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem};
 use crate::prng::{Jkiss, Prng};
 
-const MAXIMUM_ITERATIONS: u32 = 1000u32;
-const MAXIMUM_DAYS: u8 = 4u8;
+const NON_FILTER_ITERATIONS: u16 = 28u16;
+const FILTER_ITERATIONS: u16 = 1000u16;
+const FILTER_DAYS: u8 = 8u8;
 
 macro_rules! second_check {
     ($object_information:ident) => {
@@ -37,7 +41,7 @@ macro_rules! second_check {
         {
             continue;
         }
-    }
+    };
 }
 
 macro_rules! second_rng {
@@ -45,87 +49,155 @@ macro_rules! second_rng {
         $constant_multiplier = $prng.gen_range(1i32..11i32)? as u16;
         $variable_multiplier = $prng.gen_range(3i32..6i32)? as u16;
         $quantity_decider = $prng.gen_float()?;
+    };
+}
+
+pub struct TravelingCartImpl {}
+
+impl StockTableTrait for TravelingCartImpl {
+    fn get_stock(
+        configuration: &Configuration,
+        date: i32,
+        filter: &String,
+    ) -> Result<Vec<Vec<TableCell>>> {
+        let iterations: u16 = if filter.is_empty() {
+            NON_FILTER_ITERATIONS
+        } else {
+            FILTER_ITERATIONS
+        };
+        let mut days_generated: u8 = 0u8;
+        let mut table: Vec<Vec<TableCell>> = Vec::new();
+        for iteration in 0u16..iterations {
+            let date: i32 = date + iteration as i32;
+            match (
+                day_number(date) % 7u8,
+                day_number(date),
+                season_number(date),
+            ) {
+                // Dates start at 1, hence the subtraction.
+                (4u8 | 6u8, _, _) => {}            // Friday or sunday.
+                (_, 14u8 | 15u8 | 16u8, 3u8) => {} // Night market.
+                (_, _, _) => continue,
+            }
+
+            let seed: i32 = configuration.seed + date;
+            let mut prng: Box<dyn Prng> = match configuration.platform {
+                Platform::Switch | Platform::PC => Box::new(Jkiss::from_seed(seed)?), // TODO
+            };
+
+            // TODO: Year one completable.
+
+            let mut stock_items: Vec<StockItem> = Vec::<StockItem>::new();
+
+            let mut used_indexes: HashSet<u16> = HashSet::<u16>::new();
+            for _ in 0u8..10u8 {
+                let mut object_id: u16 = prng.gen_range(2i32..790i32)? as u16;
+                stock_items.push(loop {
+                    object_id += 1u16;
+                    object_id %= 790u16;
+
+                    if !OBJECT_INFORMATION.contains_key(&object_id)
+                        || OFF_LIMIT.contains(&object_id)
+                    {
+                        continue;
+                    }
+
+                    let object_information: &ObjectInformation =
+                        OBJECT_INFORMATION.get(&object_id).unwrap();
+
+                    // PC does the second check before the second RNG generation, Switch does the reverse.
+                    let constant_multiplier: u16;
+                    let variable_multiplier: u16;
+                    let quantity_decider: f64;
+                    match configuration.platform {
+                        Platform::PC => {
+                            second_check!(object_information);
+                            second_rng!(
+                                prng,
+                                constant_multiplier,
+                                variable_multiplier,
+                                quantity_decider
+                            );
+                        }
+                        Platform::Switch => {
+                            second_rng!(
+                                prng,
+                                constant_multiplier,
+                                variable_multiplier,
+                                quantity_decider
+                            );
+                            second_check!(object_information);
+                        }
+                    }
+
+                    if !used_indexes.insert(object_id) {
+                        continue;
+                    }
+
+                    break StockItem {
+                        id: object_id,
+                        item: Item::ObjectInformation(object_information),
+                        price: max(
+                            100u16 * constant_multiplier,
+                            object_information.price * variable_multiplier,
+                        ),
+                        quantity: if quantity_decider < 0.1f64 { 5u8 } else { 1u8 },
+                    };
+                });
+            }
+
+            if season_number(date) < 2 {
+                stock_items.push(StockItem {
+                    id: 347u16,
+                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&347u16).unwrap()),
+                    price: 1000u16,
+                    quantity: if prng.gen_float()? < 0.1f64 { 5u8 } else { 1u8 },
+                });
+            } else if prng.gen_float()? < 0.4f64 {
+                stock_items.push(StockItem {
+                    id: 136u16,
+                    item: Item::BigCraftablesInformation(
+                        BIG_CRAFTABLES_INFORMATION.get(&136u16).unwrap(),
+                    ),
+                    price: 4000u16,
+                    quantity: 1u8,
+                });
+            }
+
+            if prng.gen_float()? < 0.25f64 {
+                stock_items.push(StockItem {
+                    id: 433u16,
+                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&433u16).unwrap()),
+                    price: 2500u16,
+                    quantity: 1u8,
+                });
+            }
+
+            match stock_items_rows(&stock_items, date, filter) {
+                Some(rows) => {
+                    table.extend(rows);
+
+                    days_generated += 1u8;
+                    if !filter.is_empty() && days_generated >= FILTER_DAYS {
+                        break;
+                    }
+                }
+                None => {}
+            }
+        }
+
+        return Ok(table);
     }
 }
 
-pub fn traveling_cart(configuration: &Configuration, date: Option<i32>, filter: &String) -> Result<Vec<Vec<TableCell>>> {
-    let date: i32 = date.or(configuration.date).unwrap_or(1i32);
+#[derive(Properties, PartialEq)]
+pub struct TravelingCartProperties {
+    pub configuration: Configuration,
+}
 
-    let mut days_generated: u8 = 0u8;
-    let mut table: Vec<Vec<TableCell>> = Vec::new();
-    for iteration in 0u32..MAXIMUM_ITERATIONS {
-        let date: i32 = date + iteration as i32;
-        match (((date - 1i32) % 7i32), ((date - 1i32) % 28i32), ((date - 1i32) / 28i32) % 4i32) {  // Dates start at 1, hence the subtraction.
-            (4i32 | 6i32 , _, _) => {},  // Friday or sunday.
-            (_, 14i32 | 15i32 | 16i32, 3i32) => {},  // Night market.
-            (_, _, _) => continue,
-        }
-
-        let seed: i32 = configuration.seed + date;
-        let mut prng: Box<dyn Prng> = match configuration.platform {
-            Platform::Switch | Platform::PC => Box::new(Jkiss::from_seed(seed)?),  // TODO
-        };
-
-        // TODO: Year one completable.
-
-        let mut stock_items: Vec<StockItem> = Vec::<StockItem>::new();
-
-        let mut used_indexes: HashSet<u16> = HashSet::<u16>::new();
-        for _ in 0u8..10u8 {
-            let mut object_id: u16 = prng.gen_range(2i32..790i32)? as u16;
-            stock_items.push(loop {
-                object_id += 1u16;
-                object_id %= 790u16;
-
-                if !OBJECT_INFORMATION.contains_key(&object_id) || OFF_LIMIT.contains(&object_id) {
-                    continue
-                }
-
-                let object_information: &ObjectInformation = OBJECT_INFORMATION.get(&object_id).unwrap();
-
-                // PC does the second check before the second RNG generation, Switch does the reverse.
-                let constant_multiplier: u16;
-                let variable_multiplier: u16;
-                let quantity_decider: f64;
-                match configuration.platform {
-                    Platform::PC => {
-                        second_check!(object_information);
-                        second_rng!(prng, constant_multiplier, variable_multiplier, quantity_decider);
-                    }
-                    Platform::Switch => {
-                        second_rng!(prng, constant_multiplier, variable_multiplier, quantity_decider);
-                        second_check!(object_information);
-                    }
-
-                }
-
-                if !used_indexes.insert(object_id) {
-                    continue;
-                }
-
-                break StockItem {
-                    object_id,
-                    object_information,
-                    price: max(100u16 * constant_multiplier, object_information.price * variable_multiplier),
-                    quantity: if quantity_decider < 0.1f64 { 5u8 } else { 1u8 },
-                };
-            });
-        }
-
-        // TODO: Other items
-
-        match stock_items_rows(&stock_items, date, filter) {
-            Some(rows) => {
-                table.extend(rows);
-
-                days_generated += 1u8;
-                if days_generated >= MAXIMUM_DAYS {
-                    break
-                }
-            }
-            None => {}
-        }
+#[function_component]
+pub fn TravelingCart(properties: &TravelingCartProperties) -> Html {
+    html! {
+        <StockTable<TravelingCartImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />
     }
-
-    return Ok(table)
 }

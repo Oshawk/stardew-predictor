@@ -9,7 +9,8 @@ impl ToString for Platform {
         match self {
             Platform::PC => "PC",
             Platform::Switch => "Switch",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 

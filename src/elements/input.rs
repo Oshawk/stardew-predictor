@@ -11,7 +11,9 @@ pub struct InputProperties<T: Copy + FromStr + PartialEq + ToString + 'static> {
 }
 
 #[function_component]
-pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(properties: &InputProperties<T>) -> Html {
+pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(
+    properties: &InputProperties<T>,
+) -> Html {
     let value: UseForceUpdateHandle = use_force_update();
     let value_updated: Callback<InputEvent> = {
         let value: UseForceUpdateHandle = value.clone();

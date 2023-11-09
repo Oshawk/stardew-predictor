@@ -44,7 +44,8 @@ impl ToString for TableAlign {
             TableAlign::BottomLeft => "vertical-align: bottom; text-align: left;",
             TableAlign::BottomCenter => "vertical-align: bottom; text-align: center;",
             TableAlign::BottomRight => "vertical-align: bottom; text-align: right;",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 

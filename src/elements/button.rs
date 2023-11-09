@@ -3,8 +3,8 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct ButtonProperties {
     pub updated: Callback<()>,
-    #[prop_or("Button".to_string())]
-    pub label: String,
+    #[prop_or(AttrValue::from("Button"))]
+    pub label: AttrValue,
 }
 
 #[function_component]
