@@ -19,8 +19,8 @@ use yew::prelude::*;
 use crate::codegen::{
     ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OFF_LIMIT,
 };
-use crate::compounds::stock_table::{StockTable, StockTableTrait};
-use crate::compounds::table::TableCell;
+use crate::components::stock_table::{StockTable, StockTableTrait};
+use crate::components::table::TableCell;
 use crate::configuration::{Configuration, Platform};
 use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem};
 use crate::prng::{Jkiss, Prng};

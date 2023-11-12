@@ -13,7 +13,7 @@ impl ToHtml for TableValue {
             TableValue::None => html!(),
             TableValue::String(string) => html!({ string }),
             TableValue::Sprite(image, x, y, width, height) => html!(
-                <figure class={ format!("image is-{}x{}", width, height) } style={ format!("background: url(/assets/{}) -{}px -{}px;", image, x, y) } />
+                <figure class={ format!("image") } style={ format!("background: url(/assets/{}) -{}px -{}px; width: {}px; height: {}px;", image, x, y, width, height) } />
             ),
         }
     }

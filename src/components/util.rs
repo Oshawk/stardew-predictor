@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::compounds::table::{TableAlign, TableCell, TableValue};
+use crate::components::table::{TableAlign, TableCell, TableValue};
 
 pub fn stock_items_table_header() -> Vec<Vec<TableCell>> {
     vec![vec![

@@ -2,11 +2,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use yew::prelude::*;
 
+use crate::components::button::Button;
+use crate::components::dropdown::Dropdown;
+use crate::components::input::Input;
+use crate::components::message::{Message, MessageColour};
 use crate::configuration::{Configuration, Platform};
-use crate::elements::button::Button;
-use crate::elements::dropdown::Dropdown;
-use crate::elements::input::Input;
-use crate::elements::message::{Message, MessageColour};
 
 #[derive(Properties, PartialEq)]
 pub struct ConfigurationFormProperties {

@@ -3,13 +3,13 @@ use std::cmp::max;
 use anyhow::Result;
 use yew::prelude::*;
 
-use crate::compounds::date_jump::DateJump;
-use crate::compounds::filter::Filter;
-use crate::compounds::navigation::{Navigation, NavigationDirection};
-use crate::compounds::table::{Table, TableCell};
-use crate::compounds::util::stock_items_table_header;
+use crate::components::date_jump::DateJump;
+use crate::components::filter::Filter;
+use crate::components::message::{Message, MessageColour};
+use crate::components::navigation::{Navigation, NavigationDirection};
+use crate::components::table::{Table, TableCell};
+use crate::components::util::stock_items_table_header;
 use crate::configuration::Configuration;
-use crate::elements::message::{Message, MessageColour};
 
 pub trait StockTableTrait {
     fn get_stock(

@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::compounds::configuration_form::ConfigurationForm;
+use crate::components::configuration_form::ConfigurationForm;
 use crate::configuration::Configuration;
 use crate::implementations::traveling_cart::TravelingCart;
 

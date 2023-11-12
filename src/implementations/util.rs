@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use crate::codegen::{BigCraftablesInformation, ObjectInformation};
-use crate::compounds::table::{TableAlign, TableCell, TableValue};
+use crate::components::table::{TableAlign, TableCell, TableValue};
 
 const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
 const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
