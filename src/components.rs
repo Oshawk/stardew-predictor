@@ -1,11 +1,12 @@
+pub mod button;
 pub mod configuration_form;
 pub mod date_jump;
+pub mod dropdown;
 pub mod filter;
+pub mod input;
+pub mod message;
 pub mod navigation;
 pub mod stock_table;
 pub mod table;
+pub mod tabs;
 pub mod util;
-pub mod button;
-pub mod dropdown;
-pub mod input;
-pub mod message;

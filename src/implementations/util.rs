@@ -2,6 +2,7 @@ use yew::prelude::*;
 
 use crate::codegen::{BigCraftablesInformation, ObjectInformation};
 use crate::components::table::{TableAlign, TableCell, TableValue};
+use crate::implementations::traveling_cart::TravelingCart;
 
 const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
 const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
@@ -11,6 +12,20 @@ const BIG_CRAFTABLES_INFORMATION_ICON_FILE: &'static str = "Craftables.png";
 const BIG_CRAFTABLES_INFORMATION_ICON_WIDTH: u16 = 16u16;
 const BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT: u16 = 32u16;
 const BIG_CRAFTABLES_INFORMATION_ICONS_PER_ROW: u16 = 8u16;
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum Implementation {
+    TravelingCart,
+}
+
+impl ToString for Implementation {
+    fn to_string(&self) -> String {
+        match self {
+            Implementation::TravelingCart => "Traveling Cart",
+        }
+        .to_string()
+    }
+}
 
 pub enum Item {
     ObjectInformation(&'static ObjectInformation),
