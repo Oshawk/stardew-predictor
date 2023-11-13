@@ -16,13 +16,11 @@ use std::collections::HashSet;
 use anyhow::Result;
 use yew::prelude::*;
 
-use crate::codegen::{
-    ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OFF_LIMIT,
-};
+use crate::codegen::{ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OBJECT_INFORMATION_OFF_LIMIT, Furniture, FURNITURE};
 use crate::components::stock_table::{StockTable, StockTableTrait};
 use crate::components::table::TableCell;
 use crate::configuration::{Configuration, Platform};
-use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem};
+use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem, get_random_furniture};
 use crate::prng::{Jkiss, Prng};
 
 const NON_FILTER_ITERATIONS: u16 = 28u16;
@@ -91,19 +89,19 @@ impl StockTableTrait for TravelingCartImpl {
 
             let mut used_indexes: HashSet<u16> = HashSet::<u16>::new();
             for _ in 0u8..10u8 {
-                let mut object_id: u16 = prng.gen_range(2i32..790i32)? as u16;
+                let mut id: u16 = prng.gen_range(2i32..790i32)? as u16;
                 stock_items.push(loop {
-                    object_id += 1u16;
-                    object_id %= 790u16;
+                    id += 1u16;
+                    id %= 790u16;
 
-                    if !OBJECT_INFORMATION.contains_key(&object_id)
-                        || OFF_LIMIT.contains(&object_id)
+                    if !OBJECT_INFORMATION.contains_key(&id)
+                        || OBJECT_INFORMATION_OFF_LIMIT.contains(&id)
                     {
                         continue;
                     }
 
                     let object_information: &ObjectInformation =
-                        OBJECT_INFORMATION.get(&object_id).unwrap();
+                        OBJECT_INFORMATION.get(&id).unwrap();
 
                     // PC does the second check before the second RNG generation, Switch does the reverse.
                     let constant_multiplier: u32;
@@ -130,12 +128,12 @@ impl StockTableTrait for TravelingCartImpl {
                         }
                     }
 
-                    if !used_indexes.insert(object_id) {
+                    if !used_indexes.insert(id) {
                         continue;
                     }
 
                     break StockItem {
-                        id: object_id,
+                        id,
                         item: Item::ObjectInformation(object_information),
                         price: max(
                             100u32 * constant_multiplier,
@@ -145,6 +143,16 @@ impl StockTableTrait for TravelingCartImpl {
                     };
                 });
             }
+
+            // This should be different on PC.
+            let furniture_price: u32 = prng.gen_range(1i32..11i32)? as u32 * 250u32;
+            let furniture_id: u16 = get_random_furniture(&mut prng, 0u16, 1613u16)?;
+            stock_items.push(StockItem {
+                id: furniture_id,
+                item: Item::Furniture(FURNITURE.get(&furniture_id).unwrap()),
+                price: furniture_price,
+                quantity: 1u8,
+            });
 
             if season_number(date) < 2 {
                 stock_items.push(StockItem {

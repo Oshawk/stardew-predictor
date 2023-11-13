@@ -1,8 +1,11 @@
 use yew::prelude::*;
 
-use crate::codegen::{BigCraftablesInformation, Furniture, ObjectInformation};
+use anyhow::Result;
+
+use crate::codegen::{BigCraftablesInformation, Furniture, FURNITURE, FURNITURE_OFF_LIMIT, ObjectInformation};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::implementations::traveling_cart::TravelingCart;
+use crate::prng::Prng;
 
 const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
 const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
@@ -150,7 +153,7 @@ pub fn stock_items_rows(
                         furniture.source_rectangle_width as u16 * FURNITURE_ICON_UNIT,
                         furniture.source_rectangle_height as u16 * FURNITURE_ICON_UNIT,
                         FURNITURE_ICON_SHEET_WIDTH,
-                        FURNITURE_ICON_SHEET_WIDTH,
+                        FURNITURE_ICON_SHEET_HEIGHT,
                     ),
                 },
                 align: TableAlign::MiddleCenter,
@@ -197,4 +200,14 @@ pub fn stock_items_rows(
     );
 
     Some(rows)
+}
+
+pub fn get_random_furniture(prng: &mut Box<dyn Prng>, lower_bound: u16, upper_bound: u16) -> Result<u16> {
+    loop {
+        let id: u16 = prng.gen_range((lower_bound as i32)..(upper_bound as i32))? as u16;
+        if !FURNITURE.contains_key(&id) || FURNITURE_OFF_LIMIT.contains(&id) {
+            continue;
+        }
+        return Ok(id);
+    }
 }
