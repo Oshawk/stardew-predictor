@@ -56,7 +56,7 @@ impl Item {
 pub struct StockItem {
     pub id: u16,
     pub item: Item,
-    pub price: u16,
+    pub price: u32,
     pub quantity: u8,
 }
 

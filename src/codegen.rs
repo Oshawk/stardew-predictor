@@ -1,6 +1,6 @@
 pub struct ObjectInformation {
     pub name: &'static str,
-    pub price: u16,
+    pub price: u32,
     pub edibility: i16,
     pub type_and_category: &'static str,
     pub display_name: &'static str,
@@ -9,7 +9,7 @@ pub struct ObjectInformation {
 
 pub struct BigCraftablesInformation {
     pub name: &'static str,
-    pub price: u16,
+    pub price: u32,
     pub edibility: i16,
     pub type_and_category: &'static str,
     pub description: &'static str,

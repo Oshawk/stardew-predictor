@@ -46,8 +46,8 @@ macro_rules! second_check {
 
 macro_rules! second_rng {
     ($prng:ident, $constant_multiplier:ident, $variable_multiplier:ident, $quantity_decider:ident) => {
-        $constant_multiplier = $prng.gen_range(1i32..11i32)? as u16;
-        $variable_multiplier = $prng.gen_range(3i32..6i32)? as u16;
+        $constant_multiplier = $prng.gen_range(1i32..11i32)? as u32;
+        $variable_multiplier = $prng.gen_range(3i32..6i32)? as u32;
         $quantity_decider = $prng.gen_float()?;
     };
 }
@@ -106,8 +106,8 @@ impl StockTableTrait for TravelingCartImpl {
                         OBJECT_INFORMATION.get(&object_id).unwrap();
 
                     // PC does the second check before the second RNG generation, Switch does the reverse.
-                    let constant_multiplier: u16;
-                    let variable_multiplier: u16;
+                    let constant_multiplier: u32;
+                    let variable_multiplier: u32;
                     let quantity_decider: f64;
                     match configuration.platform {
                         Platform::PC => {
@@ -138,7 +138,7 @@ impl StockTableTrait for TravelingCartImpl {
                         id: object_id,
                         item: Item::ObjectInformation(object_information),
                         price: max(
-                            100u16 * constant_multiplier,
+                            100u32 * constant_multiplier,
                             object_information.price * variable_multiplier,
                         ),
                         quantity: if quantity_decider < 0.1f64 { 5u8 } else { 1u8 },
@@ -150,7 +150,7 @@ impl StockTableTrait for TravelingCartImpl {
                 stock_items.push(StockItem {
                     id: 347u16,
                     item: Item::ObjectInformation(OBJECT_INFORMATION.get(&347u16).unwrap()),
-                    price: 1000u16,
+                    price: 1000u32,
                     quantity: if prng.gen_float()? < 0.1f64 { 5u8 } else { 1u8 },
                 });
             } else if prng.gen_float()? < 0.4f64 {
@@ -159,7 +159,7 @@ impl StockTableTrait for TravelingCartImpl {
                     item: Item::BigCraftablesInformation(
                         BIG_CRAFTABLES_INFORMATION.get(&136u16).unwrap(),
                     ),
-                    price: 4000u16,
+                    price: 4000u32,
                     quantity: 1u8,
                 });
             }
@@ -168,7 +168,7 @@ impl StockTableTrait for TravelingCartImpl {
                 stock_items.push(StockItem {
                     id: 433u16,
                     item: Item::ObjectInformation(OBJECT_INFORMATION.get(&433u16).unwrap()),
-                    price: 2500u16,
+                    price: 2500u32,
                     quantity: 1u8,
                 });
             }

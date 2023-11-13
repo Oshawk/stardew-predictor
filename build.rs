@@ -13,7 +13,7 @@ trait FromValueSplit {
 #[derive(Debug)]
 struct ObjectInformation {
     pub name: String,
-    pub price: u16,
+    pub price: u32,
     pub edibility: i16,
     pub type_and_category: String,
     pub display_name: String,
@@ -24,7 +24,7 @@ impl FromValueSplit for ObjectInformation {
     fn from_value_split(value_split: &Vec<&str>) -> Self {
         Self {
             name: value_split[0usize].to_string(),
-            price: value_split[1usize].parse::<u16>().unwrap(),
+            price: value_split[1usize].parse::<u32>().unwrap(),
             edibility: value_split[2usize].parse::<i16>().unwrap(),
             type_and_category: value_split[3usize].to_string(),
             display_name: value_split[4usize].to_string(),
@@ -36,7 +36,7 @@ impl FromValueSplit for ObjectInformation {
 #[derive(Debug)]
 struct BigCraftablesInformation {
     pub name: String,
-    pub price: u16,
+    pub price: u32,
     pub edibility: i16,
     pub type_and_category: String,
     pub description: String,
@@ -50,7 +50,7 @@ impl FromValueSplit for BigCraftablesInformation {
     fn from_value_split(value_split: &Vec<&str>) -> Self {
         Self {
             name: value_split[0usize].to_string(),
-            price: value_split[1usize].parse::<u16>().unwrap(),
+            price: value_split[1usize].parse::<u32>().unwrap(),
             edibility: value_split[2usize].parse::<i16>().unwrap(),
             type_and_category: value_split[3usize].to_string(),
             description: value_split[4usize].to_string(),
