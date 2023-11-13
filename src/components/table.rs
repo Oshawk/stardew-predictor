@@ -1,10 +1,12 @@
 use yew::prelude::*;
 
+const SPRITE_HEIGHT: u8 = 16u8;
+
 #[derive(PartialEq)]
 pub enum TableValue {
     None,
     String(AttrValue),
-    Sprite(AttrValue, u16, u16, u16, u16),
+    Sprite(AttrValue, u16, u16, u16, u16, u16, u16),
 }
 
 impl ToHtml for TableValue {
@@ -12,8 +14,8 @@ impl ToHtml for TableValue {
         match self {
             TableValue::None => html!(),
             TableValue::String(string) => html!({ string }),
-            TableValue::Sprite(image, x, y, width, height) => html!(
-                <figure class={ format!("image") } style={ format!("background: url(/assets/{}) -{}px -{}px; width: {}px; height: {}px;", image, x, y, width, height) } />
+            TableValue::Sprite(image, x, y, width, height, sheet_width, sheet_height) => html!(
+                <figure class={ format!("image") } style={ format!("background: url(/assets/{image}) calc(-{x}px * ({SPRITE_HEIGHT} / {height})) calc(-{y}px * ({SPRITE_HEIGHT} / {height})) / calc({sheet_width}px * ({SPRITE_HEIGHT} / {height})) calc({sheet_height}px * ({SPRITE_HEIGHT} / {height})); width: calc({width}px * ({SPRITE_HEIGHT} / {height})); height: calc({height}px * ({SPRITE_HEIGHT} / {height})); display: inline-block;") } />
             ),
         }
     }

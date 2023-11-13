@@ -19,6 +19,17 @@ pub struct BigCraftablesInformation {
     pub display_name: &'static str,
 }
 
+pub struct Furniture {
+    pub name: &'static str,
+    pub type_: &'static str,
+    pub source_rectangle_width: u8,
+    pub source_rectangle_height: u8,
+    pub bounding_box_width: u8,
+    pub bounding_box_height: u8,
+    pub rotations: u8,
+    pub price: u32,
+}
+
 include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 pub static OFF_LIMIT: phf::Set<u16> = phf::phf_set!(

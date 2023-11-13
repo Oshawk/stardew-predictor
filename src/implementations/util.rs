@@ -1,17 +1,27 @@
 use yew::prelude::*;
 
-use crate::codegen::{BigCraftablesInformation, ObjectInformation};
+use crate::codegen::{BigCraftablesInformation, Furniture, ObjectInformation};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::implementations::traveling_cart::TravelingCart;
 
 const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
 const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
 const OBJECT_INFORMATION_ICONS_PER_ROW: u16 = 24u16;
+const OBJECT_INFORMATION_ICON_SHEET_WIDTH: u16 = 384u16;
+const OBJECT_INFORMATION_ICON_SHEET_HEIGHT: u16 = 624u16;
 
 const BIG_CRAFTABLES_INFORMATION_ICON_FILE: &'static str = "Craftables.png";
 const BIG_CRAFTABLES_INFORMATION_ICON_WIDTH: u16 = 16u16;
 const BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT: u16 = 32u16;
 const BIG_CRAFTABLES_INFORMATION_ICONS_PER_ROW: u16 = 8u16;
+const BIG_CRAFTABLES_INFORMATION_ICON_SHEET_WIDTH: u16 = 128u16;
+const BIG_CRAFTABLES_INFORMATION_ICON_SHEET_HEIGHT: u16 = 1152u16;
+
+const FURNITURE_ICON_FILE: &'static str = "furniture.png";
+const FURNITURE_ICON_UNIT: u16 = 16u16;
+const FURNITURE_ICON_UNITS_PER_ROW: u16 = 32u16;
+const FURNITURE_ICON_SHEET_WIDTH: u16 = 512u16;
+const FURNITURE_ICON_SHEET_HEIGHT: u16 = 1488u16;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Implementation {
@@ -30,6 +40,7 @@ impl ToString for Implementation {
 pub enum Item {
     ObjectInformation(&'static ObjectInformation),
     BigCraftablesInformation(&'static BigCraftablesInformation),
+    Furniture(&'static Furniture),
 }
 
 impl Item {
@@ -37,6 +48,7 @@ impl Item {
         match self {
             Item::ObjectInformation(object) => object.name,
             Item::BigCraftablesInformation(big_craftable) => big_craftable.name,
+            Item::Furniture(furniture) => furniture.name,
         }
     }
 }
@@ -117,6 +129,8 @@ pub fn stock_items_rows(
                             * OBJECT_INFORMATION_ICON_SIZE,
                         OBJECT_INFORMATION_ICON_SIZE,
                         OBJECT_INFORMATION_ICON_SIZE,
+                        OBJECT_INFORMATION_ICON_SHEET_WIDTH,
+                        OBJECT_INFORMATION_ICON_SHEET_HEIGHT,
                     ),
                     Item::BigCraftablesInformation(_) => TableValue::Sprite(
                         AttrValue::from(BIG_CRAFTABLES_INFORMATION_ICON_FILE),
@@ -126,6 +140,17 @@ pub fn stock_items_rows(
                             * BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT,
                         BIG_CRAFTABLES_INFORMATION_ICON_WIDTH,
                         BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT,
+                        BIG_CRAFTABLES_INFORMATION_ICON_SHEET_WIDTH,
+                        BIG_CRAFTABLES_INFORMATION_ICON_SHEET_HEIGHT,
+                    ),
+                    Item::Furniture(furniture) => TableValue::Sprite(
+                        AttrValue::from(FURNITURE_ICON_FILE),
+                        (stock_item.id % FURNITURE_ICON_UNITS_PER_ROW) * FURNITURE_ICON_UNIT,
+                        (stock_item.id / FURNITURE_ICON_UNITS_PER_ROW) * FURNITURE_ICON_UNIT,
+                        furniture.source_rectangle_width as u16 * FURNITURE_ICON_UNIT,
+                        furniture.source_rectangle_height as u16 * FURNITURE_ICON_UNIT,
+                        FURNITURE_ICON_SHEET_WIDTH,
+                        FURNITURE_ICON_SHEET_WIDTH,
                     ),
                 },
                 align: TableAlign::MiddleCenter,
