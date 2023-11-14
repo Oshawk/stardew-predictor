@@ -13,15 +13,16 @@
 use std::cmp::max;
 use std::collections::HashSet;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use yew::prelude::*;
 
 use crate::codegen::{ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OBJECT_INFORMATION_OFF_LIMIT, Furniture, FURNITURE};
 use crate::components::stock_table::{StockTable, StockTableTrait};
+use crate::components::message::{Message, MessageColour};
 use crate::components::table::TableCell;
 use crate::configuration::{Configuration, Platform};
 use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem, get_random_furniture};
-use crate::prng::{Jkiss, Prng};
+use crate::prng::{Jkiss, MsCorLibRandom, Prng};
 
 const NON_FILTER_ITERATIONS: u16 = 28u16;
 const FILTER_ITERATIONS: u16 = 1000u16;
@@ -80,7 +81,8 @@ impl StockTableTrait for TravelingCartImpl {
 
             let seed: i32 = configuration.seed + date;
             let mut prng: Box<dyn Prng> = match configuration.platform {
-                Platform::Switch | Platform::PC => Box::new(Jkiss::from_seed(seed)?), // TODO
+                Platform::Switch => Box::new(Jkiss::from_seed(seed)?),
+                Platform::PC => Box::new(MsCorLibRandom::from_seed(seed)?),
             };
 
             // TODO: Year one completable.
@@ -101,7 +103,7 @@ impl StockTableTrait for TravelingCartImpl {
                     }
 
                     let object_information: &ObjectInformation =
-                        OBJECT_INFORMATION.get(&id).unwrap();
+                        OBJECT_INFORMATION.get(&id).context("Error getting object information.")?;
 
                     // PC does the second check before the second RNG generation, Switch does the reverse.
                     let constant_multiplier: u32;
@@ -149,7 +151,7 @@ impl StockTableTrait for TravelingCartImpl {
             let furniture_id: u16 = get_random_furniture(&mut prng, 0u16, 1613u16)?;
             stock_items.push(StockItem {
                 id: furniture_id,
-                item: Item::Furniture(FURNITURE.get(&furniture_id).unwrap()),
+                item: Item::Furniture(FURNITURE.get(&furniture_id).context("Error getting furniture.")?),
                 price: furniture_price,
                 quantity: 1u8,
             });
@@ -157,7 +159,7 @@ impl StockTableTrait for TravelingCartImpl {
             if season_number(date) < 2 {
                 stock_items.push(StockItem {
                     id: 347u16,
-                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&347u16).unwrap()),
+                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&347u16).context("Error getting object information.")?),
                     price: 1000u32,
                     quantity: if prng.gen_float()? < 0.1f64 { 5u8 } else { 1u8 },
                 });
@@ -165,7 +167,7 @@ impl StockTableTrait for TravelingCartImpl {
                 stock_items.push(StockItem {
                     id: 136u16,
                     item: Item::BigCraftablesInformation(
-                        BIG_CRAFTABLES_INFORMATION.get(&136u16).unwrap(),
+                        BIG_CRAFTABLES_INFORMATION.get(&136u16).context("Error getting big craftables information.")?,
                     ),
                     price: 4000u32,
                     quantity: 1u8,
@@ -175,7 +177,7 @@ impl StockTableTrait for TravelingCartImpl {
             if prng.gen_float()? < 0.25f64 {
                 stock_items.push(StockItem {
                     id: 433u16,
-                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&433u16).unwrap()),
+                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&433u16).context("Error getting object information.")?),
                     price: 2500u32,
                     quantity: 1u8,
                 });
@@ -195,6 +197,20 @@ impl StockTableTrait for TravelingCartImpl {
         }
 
         return Ok(table);
+    }
+
+    fn get_messages(configuration: &Configuration) -> Html {
+        html!(
+            <>
+                <Message colour={ MessageColour::Info } body="All stock available from the traveling cart (and night market boat)." />
+                {
+                    match configuration.date {
+                        Some(_) => html!(),
+                        None => html!(<Message colour={ MessageColour::Warning } body="Use the date optional configuration parameter to always display from that date." />),
+                    }
+                }
+            </>
+        )
     }
 }
 

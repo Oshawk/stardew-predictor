@@ -17,6 +17,8 @@ pub trait StockTableTrait {
         date: i32,
         filter: &String,
     ) -> Result<Vec<Vec<TableCell>>>;
+
+    fn get_messages(configuration: &Configuration) -> Html;
 }
 
 #[derive(Properties, PartialEq)]
@@ -61,6 +63,7 @@ pub fn StockTable<T: StockTableTrait>(properties: &StockTableProperties) -> Html
         Ok(table) => {
             html!(
                 <>
+                    { T::get_messages(&properties.configuration) }
                     <div class="columns">
                         <div class="column">
                             <DateJump updated={ date_jump_updated } />
