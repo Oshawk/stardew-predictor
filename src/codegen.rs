@@ -30,6 +30,18 @@ pub struct Furniture {
     pub price: u32,
 }
 
+pub struct ClothingInformation {
+    pub name: &'static str,
+    pub display_name: &'static str,
+    pub description: &'static str,
+    pub male_index: u16,
+    pub female_index: u16,
+    pub price: u32,
+    pub rgb: (u8, u8, u8),
+    pub dyeable: bool,
+    pub type_: &'static str,
+}
+
 include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 pub static OBJECT_INFORMATION_OFF_LIMIT: phf::Set<u16> = phf::phf_set!(

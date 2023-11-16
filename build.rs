@@ -3,6 +3,7 @@ use std::env;
 use std::fmt::Debug;
 use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
 use std::str::Split;
 
@@ -165,6 +166,47 @@ impl FromValueSplit for Furniture {
     }
 }
 
+#[derive(Debug)]
+struct ClothingInformation {
+    pub name: String,
+    pub display_name: String,
+    pub description: String,
+    pub male_index: u16,
+    pub female_index: u16,
+    pub price: u32,
+    pub rgb: (u8, u8, u8),
+    pub dyeable: bool,
+    pub type_: String,
+}
+
+impl FromValueSplit for ClothingInformation {
+    fn from_value_split(value_split: &Vec<&str>) -> Self {
+        let male_index: u16 = value_split[3usize].parse::<u16>().unwrap();
+        let female_index: u16 = match value_split[4usize] {
+            "-1" => male_index,
+            _ => value_split[4usize].parse::<u16>().unwrap(),
+        };
+
+        let mut rgb_split: Split<&str> = value_split[6usize].split(" ");
+
+        Self {
+            name: value_split[0usize].to_string(),
+            display_name: value_split[1usize].to_string(),
+            description: value_split[2usize].to_string(),
+            male_index,
+            female_index,
+            price: value_split[5usize].parse::<u32>().unwrap(),
+            rgb: (
+                rgb_split.next().unwrap().parse::<u8>().unwrap(),
+                rgb_split.next().unwrap().parse::<u8>().unwrap(),
+                rgb_split.next().unwrap().parse::<u8>().unwrap()
+            ),
+            dyeable: value_split[7usize].parse::<bool>().unwrap(),
+            type_: value_split[8usize].to_string(),
+        }
+    }
+}
+
 fn load<T: Debug + FromValueSplit>(
     out_file: &mut BufWriter<File>,
     path: &Path,
@@ -179,7 +221,10 @@ fn load<T: Debug + FromValueSplit>(
     for (key, value) in json.get("content").unwrap().as_object().unwrap() {
         let value_split: Vec<&str> = value.as_str().unwrap().split("/").collect();
         map.insert(
-            key.parse::<u16>().unwrap(),
+            match key.parse::<u16>() {  // Clothing has some negative keys.
+                Ok(key) => key,
+                Err(_) => continue,
+            },
             T::from_value_split(&value_split),
         );
     }
@@ -220,4 +265,12 @@ fn main() {
 
     let furniture_path: &Path = Path::new("assets/Furniture.json");
     load::<Furniture>(&mut out_file, furniture_path, "FURNITURE", "Furniture");
+
+    let clothing_information_path: &Path = Path::new("assets/ClothingInformation.json");
+    load::<ClothingInformation>(
+        &mut out_file,
+        clothing_information_path,
+        "CLOTHING_INFORMATION",
+        "ClothingInformation",
+    );
 }
