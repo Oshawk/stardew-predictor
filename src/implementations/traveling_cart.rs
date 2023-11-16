@@ -1,27 +1,20 @@
-// Need a function that takes:
-// - Config
-// - Day
-// - Search
-// And returns a table body.
-
-// A component to select the date.
-
-// A component to set the search.
-
-// A component to change the page.
-
 use std::cmp::max;
 use std::collections::HashSet;
 
 use anyhow::{Context, Result};
 use yew::prelude::*;
 
-use crate::codegen::{ObjectInformation, BIG_CRAFTABLES_INFORMATION, OBJECT_INFORMATION, OBJECT_INFORMATION_OFF_LIMIT, Furniture, FURNITURE};
-use crate::components::stock_table::{StockTable, StockTableTrait};
+use crate::codegen::{
+    Furniture, ObjectInformation, BIG_CRAFTABLES_INFORMATION, FURNITURE, OBJECT_INFORMATION,
+    OBJECT_INFORMATION_OFF_LIMIT,
+};
 use crate::components::message::{Message, MessageColour};
+use crate::components::stock_table::{StockTable, StockTableTrait};
 use crate::components::table::TableCell;
 use crate::configuration::{Configuration, Platform};
-use crate::implementations::util::{day_number, season_number, stock_items_rows, Item, StockItem, get_random_furniture};
+use crate::implementations::util::{
+    day_number, get_random_furniture, season_number, stock_items_rows, Item, StockItem,
+};
 use crate::prng::{Jkiss, MsCorLibRandom, Prng};
 
 const NON_FILTER_ITERATIONS: u16 = 28u16;
@@ -48,6 +41,18 @@ macro_rules! second_rng {
         $constant_multiplier = $prng.gen_range(1i32..11i32)? as u32;
         $variable_multiplier = $prng.gen_range(3i32..6i32)? as u32;
         $quantity_decider = $prng.gen_float()?;
+    };
+}
+
+macro_rules! gen_furniture_id {
+    ($prng:ident, $furniture_id:ident) => {
+        $furniture_id = get_random_furniture(&mut $prng, 0u16, 1613u16)?;
+    };
+}
+
+macro_rules! gen_furniture_price {
+    ($prng:ident, $furniture_price:ident) => {
+        $furniture_price = $prng.gen_range(1i32..11i32)? as u32 * 250u32;
     };
 }
 
@@ -102,8 +107,9 @@ impl StockTableTrait for TravelingCartImpl {
                         continue;
                     }
 
-                    let object_information: &ObjectInformation =
-                        OBJECT_INFORMATION.get(&id).context("Error getting object information.")?;
+                    let object_information: &ObjectInformation = OBJECT_INFORMATION
+                        .get(&id)
+                        .context("Error getting object information.")?;
 
                     // PC does the second check before the second RNG generation, Switch does the reverse.
                     let constant_multiplier: u32;
@@ -146,12 +152,26 @@ impl StockTableTrait for TravelingCartImpl {
                 });
             }
 
-            // This should be different on PC.
-            let furniture_price: u32 = prng.gen_range(1i32..11i32)? as u32 * 250u32;
-            let furniture_id: u16 = get_random_furniture(&mut prng, 0u16, 1613u16)?;
+            let furniture_id: u16;
+            let furniture_price: u32;
+            match configuration.platform {
+                Platform::PC => {
+                    gen_furniture_id!(prng, furniture_id);
+                    gen_furniture_price!(prng, furniture_price);
+                }
+                Platform::Switch => {
+                    gen_furniture_price!(prng, furniture_price);
+                    gen_furniture_id!(prng, furniture_id);
+                }
+            }
+
             stock_items.push(StockItem {
                 id: furniture_id,
-                item: Item::Furniture(FURNITURE.get(&furniture_id).context("Error getting furniture.")?),
+                item: Item::Furniture(
+                    FURNITURE
+                        .get(&furniture_id)
+                        .context("Error getting furniture.")?,
+                ),
                 price: furniture_price,
                 quantity: 1u8,
             });
@@ -159,7 +179,11 @@ impl StockTableTrait for TravelingCartImpl {
             if season_number(date) < 2 {
                 stock_items.push(StockItem {
                     id: 347u16,
-                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&347u16).context("Error getting object information.")?),
+                    item: Item::ObjectInformation(
+                        OBJECT_INFORMATION
+                            .get(&347u16)
+                            .context("Error getting object information.")?,
+                    ),
                     price: 1000u32,
                     quantity: if prng.gen_float()? < 0.1f64 { 5u8 } else { 1u8 },
                 });
@@ -167,7 +191,9 @@ impl StockTableTrait for TravelingCartImpl {
                 stock_items.push(StockItem {
                     id: 136u16,
                     item: Item::BigCraftablesInformation(
-                        BIG_CRAFTABLES_INFORMATION.get(&136u16).context("Error getting big craftables information.")?,
+                        BIG_CRAFTABLES_INFORMATION
+                            .get(&136u16)
+                            .context("Error getting big craftables information.")?,
                     ),
                     price: 4000u32,
                     quantity: 1u8,
@@ -177,7 +203,11 @@ impl StockTableTrait for TravelingCartImpl {
             if prng.gen_float()? < 0.25f64 {
                 stock_items.push(StockItem {
                     id: 433u16,
-                    item: Item::ObjectInformation(OBJECT_INFORMATION.get(&433u16).context("Error getting object information.")?),
+                    item: Item::ObjectInformation(
+                        OBJECT_INFORMATION
+                            .get(&433u16)
+                            .context("Error getting object information.")?,
+                    ),
                     price: 2500u32,
                     quantity: 1u8,
                 });

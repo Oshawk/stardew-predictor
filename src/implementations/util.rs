@@ -2,7 +2,9 @@ use yew::prelude::*;
 
 use anyhow::Result;
 
-use crate::codegen::{BigCraftablesInformation, Furniture, FURNITURE, FURNITURE_OFF_LIMIT, ObjectInformation};
+use crate::codegen::{
+    BigCraftablesInformation, Furniture, ObjectInformation, FURNITURE, FURNITURE_OFF_LIMIT,
+};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::implementations::traveling_cart::TravelingCart;
 use crate::prng::Prng;
@@ -202,7 +204,11 @@ pub fn stock_items_rows(
     Some(rows)
 }
 
-pub fn get_random_furniture(prng: &mut Box<dyn Prng>, lower_bound: u16, upper_bound: u16) -> Result<u16> {
+pub fn get_random_furniture(
+    prng: &mut Box<dyn Prng>,
+    lower_bound: u16,
+    upper_bound: u16,
+) -> Result<u16> {
     loop {
         let id: u16 = prng.gen_range((lower_bound as i32)..(upper_bound as i32))? as u16;
         if !FURNITURE.contains_key(&id) || FURNITURE_OFF_LIMIT.contains(&id) {

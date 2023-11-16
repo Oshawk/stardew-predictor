@@ -97,8 +97,10 @@ impl FromValueSplit for Furniture {
     fn from_value_split(value_split: &Vec<&str>) -> Self {
         let type_: &str = value_split[1usize];
 
-        let (source_rectangle_width, source_rectangle_height): (u8, u8) = match value_split[2usize] {
-            "-1" => {  // Furniture.getDefaultSourceRectForType
+        let (source_rectangle_width, source_rectangle_height): (u8, u8) = match value_split[2usize]
+        {
+            "-1" => {
+                // Furniture.getDefaultSourceRectForType
                 match type_ {
                     "chair" | "decor" | "window" | "torch" | "sconce" => (1u8, 2u8),
                     "bench" | "armchair" | "dresser" | "painting" => (2u8, 2u8),
@@ -109,18 +111,27 @@ impl FromValueSplit for Furniture {
                     "fireplace" => (2u8, 5u8),
                     _ => panic!("{}", type_),
                 }
-            },
+            }
             source_rectangle => {
                 let mut source_rectangle_split: Split<&str> = source_rectangle.split(" ");
                 (
-                    source_rectangle_split.next().unwrap().parse::<u8>().unwrap(),
-                    source_rectangle_split.next().unwrap().parse::<u8>().unwrap(),
+                    source_rectangle_split
+                        .next()
+                        .unwrap()
+                        .parse::<u8>()
+                        .unwrap(),
+                    source_rectangle_split
+                        .next()
+                        .unwrap()
+                        .parse::<u8>()
+                        .unwrap(),
                 )
             }
         };
 
         let (bounding_box_width, bounding_box_height): (u8, u8) = match value_split[2usize] {
-            "-1" => {  // Furniture.getDefaultBoundingBoxForType
+            "-1" => {
+                // Furniture.getDefaultBoundingBoxForType
                 match type_ {
                     "chair" | "lamp" | "decor" | "torch" => (1u8, 1u8),
                     "bench" | "armchair" | "dresser" | "bookcase" | "fireplace" => (2u8, 1u8),
@@ -131,7 +142,7 @@ impl FromValueSplit for Furniture {
                     "window" | "sconce" => (1u8, 2u8),
                     _ => panic!("{}", type_),
                 }
-            },
+            }
             bounding_box => {
                 let mut bounding_box_split: Split<&str> = bounding_box.split(" ");
                 (
@@ -154,7 +165,12 @@ impl FromValueSplit for Furniture {
     }
 }
 
-fn load<T: Debug + FromValueSplit>(out_file: &mut BufWriter<File>, path: &Path, constant_name: &str, struct_name: &str) {
+fn load<T: Debug + FromValueSplit>(
+    out_file: &mut BufWriter<File>,
+    path: &Path,
+    constant_name: &str,
+    struct_name: &str,
+) {
     let file: File = File::open(path).unwrap();
     let json: serde_json::Value = serde_json::from_reader(file).unwrap();
 
@@ -179,17 +195,28 @@ fn load<T: Debug + FromValueSplit>(out_file: &mut BufWriter<File>, path: &Path, 
         constant_name,
         struct_name,
         builder.build(),
-    ).unwrap();
+    )
+    .unwrap();
 }
 fn main() {
     let out_path: PathBuf = Path::new(&env::var("OUT_DIR").unwrap()).join("codegen.rs");
     let mut out_file: BufWriter<File> = BufWriter::new(File::create(&out_path).unwrap());
 
     let object_information_path: &Path = Path::new("assets/ObjectInformation.json");
-    load::<ObjectInformation>(&mut out_file, object_information_path, "OBJECT_INFORMATION", "ObjectInformation");
+    load::<ObjectInformation>(
+        &mut out_file,
+        object_information_path,
+        "OBJECT_INFORMATION",
+        "ObjectInformation",
+    );
 
     let big_craftables_information_path: &Path = Path::new("assets/BigCraftablesInformation.json");
-    load::<BigCraftablesInformation>(&mut out_file, big_craftables_information_path, "BIG_CRAFTABLES_INFORMATION", "BigCraftablesInformation");
+    load::<BigCraftablesInformation>(
+        &mut out_file,
+        big_craftables_information_path,
+        "BIG_CRAFTABLES_INFORMATION",
+        "BigCraftablesInformation",
+    );
 
     let furniture_path: &Path = Path::new("assets/Furniture.json");
     load::<Furniture>(&mut out_file, furniture_path, "FURNITURE", "Furniture");

@@ -80,15 +80,23 @@ pub struct MsCorLibRandom {
 impl MsCorLibRandom {
     fn gen(&mut self) -> i32 {
         self.n += 1usize;
-        if self.n >= 56usize { self.n = 1usize; }
+        if self.n >= 56usize {
+            self.n = 1usize;
+        }
 
         self.np += 1usize;
-        if self.np >= 56usize { self.np = 1usize; }
+        if self.np >= 56usize {
+            self.np = 1usize;
+        }
 
         let mut result: i32 = self.seed[self.n] - self.seed[self.np];
 
-        if result == i32::MAX { result -= 1i32; }
-        if result < 0i32 { result += i32::MAX; }
+        if result == i32::MAX {
+            result -= 1i32;
+        }
+        if result < 0i32 {
+            result += i32::MAX;
+        }
 
         self.seed[self.n] = result;
 
@@ -117,14 +125,18 @@ impl Prng for MsCorLibRandom {
             let ii: usize = (21usize * i) % 55usize;
             s.seed[ii] = mk;
             mk = mj - mk;
-            if mk < 0i32 { mk += i32::MAX; }
+            if mk < 0i32 {
+                mk += i32::MAX;
+            }
             mj = s.seed[ii];
         }
 
         for _ in 1usize..5usize {
             for i in 1usize..56usize {
                 s.seed[i] -= s.seed[1usize + (i + 30usize) % 55usize];
-                if s.seed[i] < 0i32 { s.seed[i] += i32::MAX; }
+                if s.seed[i] < 0i32 {
+                    s.seed[i] += i32::MAX;
+                }
             }
         }
 
@@ -141,10 +153,12 @@ impl Prng for MsCorLibRandom {
             Ok(range.start + (self.gen_float()? * difference as f64) as i32)
         } else {
             let mut sample: i32 = self.gen();
-            if self.gen() % 2i32 == 0i32 { sample = -sample; }
+            if self.gen() % 2i32 == 0i32 {
+                sample = -sample;
+            }
 
             let mut sample: f64 = sample as f64;
-            sample += (i32::MAX- 1i32) as f64;
+            sample += (i32::MAX - 1i32) as f64;
             sample /= ((2u32 * i32::MAX as u32) - 1u32) as f64;
 
             Ok((Wrapping(range.start) + Wrapping((sample * difference as f64) as u32 as i32)).0)
