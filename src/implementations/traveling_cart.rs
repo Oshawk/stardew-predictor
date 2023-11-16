@@ -5,7 +5,7 @@ use anyhow::{Context, Result};
 use yew::prelude::*;
 
 use crate::codegen::{
-    Furniture, ObjectInformation, BIG_CRAFTABLES_INFORMATION, FURNITURE, OBJECT_INFORMATION,
+    ObjectInformation, BIG_CRAFTABLES_INFORMATION, FURNITURE, OBJECT_INFORMATION,
     OBJECT_INFORMATION_OFF_LIMIT,
 };
 use crate::components::message::{Message, MessageColour};
@@ -13,12 +13,12 @@ use crate::components::stock_table::{StockTable, StockTableTrait};
 use crate::components::table::TableCell;
 use crate::configuration::{Configuration, Platform};
 use crate::implementations::util::{
-    day_number, get_random_furniture, season_number, stock_items_rows, Item, StockItem,
+    day_number, get_prng, get_random_furniture, season_number, stock_items_rows, Item, StockItem,
 };
-use crate::prng::{Jkiss, MsCorLibRandom, Prng};
+use crate::prng::Prng;
 
 const NON_FILTER_ITERATIONS: u16 = 28u16;
-const FILTER_ITERATIONS: u16 = 1000u16;
+const FILTER_ITERATIONS: u16 = 1120u16;
 const FILTER_DAYS: u8 = 8u8;
 
 macro_rules! second_check {
@@ -84,11 +84,8 @@ impl StockTableTrait for TravelingCartImpl {
                 (_, _, _) => continue,
             }
 
-            let seed: i32 = configuration.seed + date;
-            let mut prng: Box<dyn Prng> = match configuration.platform {
-                Platform::Switch => Box::new(Jkiss::from_seed(seed)?),
-                Platform::PC => Box::new(MsCorLibRandom::from_seed(seed)?),
-            };
+            let mut prng: Box<dyn Prng> =
+                get_prng(configuration.platform, configuration.seed + date)?;
 
             // TODO: Year one completable.
 

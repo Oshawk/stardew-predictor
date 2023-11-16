@@ -19,9 +19,11 @@ pub fn Tabs<T: Copy + PartialEq + ToString + 'static>(properties: &TabsPropertie
                             <li class={ if *selected == *item { "is-active" } else { "" } } >
                                 <a onclick={
                                     let item: T = *item;
+                                    let selected: UseStateHandle<T> = selected.clone();
                                     let updated: Callback<T> = properties.updated.clone();
                                     Callback::from(move |_: MouseEvent| {
                                         updated.emit(item);
+                                        selected.set(item);
                                     })
                                 }>{ item.to_string() }</a>
                             </li>

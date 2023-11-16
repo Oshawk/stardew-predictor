@@ -3,6 +3,7 @@ use yew::prelude::*;
 use crate::components::configuration_form::ConfigurationForm;
 use crate::components::tabs::Tabs;
 use crate::configuration::Configuration;
+use crate::implementations::krobus::Krobus;
 use crate::implementations::traveling_cart::TravelingCart;
 use crate::implementations::util::Implementation;
 
@@ -35,11 +36,14 @@ pub fn App() -> Html {
                         <section class="section">
                             <h1 class="title">{ "Results" }</h1>
                             <div class="container">
-                                <Tabs<Implementation> tabs={ vec![Implementation::TravelingCart] } updated={ implementation_updated } />
+                                <Tabs<Implementation> tabs={ vec![Implementation::TravelingCart, Implementation::Krobus] } updated={ implementation_updated } />
                                 {
                                     match *implementation {
                                         Implementation::TravelingCart => html!(
                                             <TravelingCart configuration={ configuration.clone() } />
+                                        ),
+                                        Implementation::Krobus => html!(
+                                            <Krobus configuration={ configuration.clone() } />
                                         ),
                                     }
                                 }

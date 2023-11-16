@@ -1,13 +1,12 @@
-use yew::prelude::*;
-
 use anyhow::Result;
+use yew::prelude::*;
 
 use crate::codegen::{
     BigCraftablesInformation, Furniture, ObjectInformation, FURNITURE, FURNITURE_OFF_LIMIT,
 };
 use crate::components::table::{TableAlign, TableCell, TableValue};
-use crate::implementations::traveling_cart::TravelingCart;
-use crate::prng::Prng;
+use crate::configuration::Platform;
+use crate::prng::{Jkiss, MsCorLibRandom, Prng};
 
 const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
 const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
@@ -31,12 +30,14 @@ const FURNITURE_ICON_SHEET_HEIGHT: u16 = 1488u16;
 #[derive(Clone, Copy, PartialEq)]
 pub enum Implementation {
     TravelingCart,
+    Krobus,
 }
 
 impl ToString for Implementation {
     fn to_string(&self) -> String {
         match self {
-            Implementation::TravelingCart => "Traveling Cart",
+            Self::TravelingCart => "Traveling Cart",
+            Self::Krobus => "Krobus",
         }
         .to_string()
     }
@@ -63,6 +64,13 @@ pub struct StockItem {
     pub item: Item,
     pub price: u32,
     pub quantity: u8,
+}
+
+pub fn get_prng(platform: Platform, seed: i32) -> Result<Box<dyn Prng>> {
+    Ok(match platform {
+        Platform::Switch => Box::new(Jkiss::from_seed(seed)?),
+        Platform::PC => Box::new(MsCorLibRandom::from_seed(seed)?),
+    })
 }
 
 pub fn day_number(date: i32) -> u8 {
