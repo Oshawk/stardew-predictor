@@ -35,11 +35,29 @@ const CLOTHING_INFORMATION_ICON_Y_MULTIPLIER: u16 = 4u16;
 const CLOTHING_INFORMATION_ICON_SHEET_WIDTH: u16 = 256u16;
 const CLOTHING_INFORMATION_ICON_SHEET_HEIGHT: u16 = 608u16;
 
+const WALLPAPER_ICON_FILE: &'static str = "walls_and_floors.png";
+const WALLPAPER_FLOORING_ICON_WIDTH: u16 = 28u16;
+const WALLPAPER_FLOORING_ICON_HEIGHT: u16 = 26u16;
+const WALLPAPER_WALLPAPER_ICON_WIDTH: u16 = 16u16;
+const WALLPAPER_WALLPAPER_ICON_HEIGHT: u16 = 28u16;
+const WALLPAPER_FLOORING_ICONS_PER_ROW: u16 = 8u16;
+const WALLPAPER_WALLPAPER_ICONS_PER_ROW: u16 = 16u16;
+const WALLPAPER_FLOORING_ICON_X_MULTIPLIER: u16 = 32u16;
+const WALLPAPER_FLOORING_ICON_Y_MULTIPLIER: u16 = 32u16;
+const WALLPAPER_WALLPAPER_ICON_X_MULTIPLIER: u16 = 16u16;
+const WALLPAPER_WALLPAPER_ICON_Y_MULTIPLIER: u16 = 48u16;
+const WALLPAPER_FLOORING_ICON_Y_OFFSET: u16 = 336u16;
+const WALLPAPER_WALLPAPER_ICON_Y_OFFSET: u16 = 8u16;
+const WALLPAPER_ICON_SHEET_WIDTH: u16 = 256u16;
+const WALLPAPER_ICON_SHEET_HEIGHT: u16 = 560u16;
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum Implementation {
     TravelingCart,
     Krobus,
     Sandy,
+    Pierre,
+    Joja,
 }
 
 impl ToString for Implementation {
@@ -48,6 +66,8 @@ impl ToString for Implementation {
             Self::TravelingCart => "Traveling Cart",
             Self::Krobus => "Krobus",
             Self::Sandy => "Sandy",
+            Self::Pierre => "Pierre",
+            Self::Joja => "Joja",
         }
         .to_string()
     }
@@ -58,6 +78,7 @@ pub enum Item {
     BigCraftablesInformation(&'static BigCraftablesInformation),
     Furniture(&'static Furniture),
     ClothingInformation(&'static ClothingInformation),
+    Wallpaper(bool),
 }
 
 impl Item {
@@ -72,6 +93,11 @@ impl Item {
                 "{} ({})",
                 clothing_information.name,
                 if id >= 1000u16 { id - 1000u16 } else { id }
+            ),
+            Self::Wallpaper(flooring) => format!(
+                "{} ({})",
+                if *flooring { "Flooring" } else { "Wallpaper" },
+                id,
             ),
         }
     }
@@ -125,6 +151,30 @@ impl Item {
                     CLOTHING_INFORMATION_ICON_SHEET_HEIGHT,
                 )
             }
+            Self::Wallpaper(flooring) => match flooring {
+                true => TableValue::Sprite(
+                    AttrValue::from(WALLPAPER_ICON_FILE),
+                    (id % WALLPAPER_FLOORING_ICONS_PER_ROW) * WALLPAPER_FLOORING_ICON_X_MULTIPLIER,
+                    (id / WALLPAPER_FLOORING_ICONS_PER_ROW) * WALLPAPER_FLOORING_ICON_Y_MULTIPLIER
+                        + WALLPAPER_FLOORING_ICON_Y_OFFSET,
+                    WALLPAPER_FLOORING_ICON_WIDTH,
+                    WALLPAPER_FLOORING_ICON_HEIGHT,
+                    WALLPAPER_ICON_SHEET_WIDTH,
+                    WALLPAPER_ICON_SHEET_HEIGHT,
+                ),
+                false => TableValue::Sprite(
+                    AttrValue::from(WALLPAPER_ICON_FILE),
+                    (id % WALLPAPER_WALLPAPER_ICONS_PER_ROW)
+                        * WALLPAPER_WALLPAPER_ICON_X_MULTIPLIER,
+                    (id / WALLPAPER_WALLPAPER_ICONS_PER_ROW)
+                        * WALLPAPER_WALLPAPER_ICON_Y_MULTIPLIER
+                        + WALLPAPER_WALLPAPER_ICON_Y_OFFSET,
+                    WALLPAPER_WALLPAPER_ICON_WIDTH,
+                    WALLPAPER_WALLPAPER_ICON_HEIGHT,
+                    WALLPAPER_ICON_SHEET_WIDTH,
+                    WALLPAPER_ICON_SHEET_HEIGHT,
+                ),
+            },
         }
     }
 }
