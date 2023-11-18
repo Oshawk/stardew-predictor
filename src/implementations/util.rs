@@ -9,48 +9,6 @@ use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::configuration::Platform;
 use crate::prng::{Jkiss, MsCorLibRandom, Prng};
 
-const OBJECT_INFORMATION_ICON_FILE: &'static str = "springobjects.png";
-const OBJECT_INFORMATION_ICON_SIZE: u16 = 16u16;
-const OBJECT_INFORMATION_ICONS_PER_ROW: u16 = 24u16;
-const OBJECT_INFORMATION_ICON_SHEET_WIDTH: u16 = 384u16;
-const OBJECT_INFORMATION_ICON_SHEET_HEIGHT: u16 = 624u16;
-
-const BIG_CRAFTABLES_INFORMATION_ICON_FILE: &'static str = "Craftables.png";
-const BIG_CRAFTABLES_INFORMATION_ICON_WIDTH: u16 = 16u16;
-const BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT: u16 = 32u16;
-const BIG_CRAFTABLES_INFORMATION_ICONS_PER_ROW: u16 = 8u16;
-const BIG_CRAFTABLES_INFORMATION_ICON_SHEET_WIDTH: u16 = 128u16;
-const BIG_CRAFTABLES_INFORMATION_ICON_SHEET_HEIGHT: u16 = 1152u16;
-
-const FURNITURE_ICON_FILE: &'static str = "furniture.png";
-const FURNITURE_ICON_UNIT: u16 = 16u16;
-const FURNITURE_ICON_UNITS_PER_ROW: u16 = 32u16;
-const FURNITURE_ICON_SHEET_WIDTH: u16 = 512u16;
-const FURNITURE_ICON_SHEET_HEIGHT: u16 = 1488u16;
-
-const CLOTHING_INFORMATION_ICON_FILE: &'static str = "shirts.png"; // This may need to change if other clothing types are sold.
-const CLOTHING_INFORMATION_ICON_SIZE: u16 = 8u16;
-const CLOTHING_INFORMATION_ICONS_PER_ROW: u16 = 16u16;
-const CLOTHING_INFORMATION_ICON_Y_MULTIPLIER: u16 = 4u16;
-const CLOTHING_INFORMATION_ICON_SHEET_WIDTH: u16 = 256u16;
-const CLOTHING_INFORMATION_ICON_SHEET_HEIGHT: u16 = 608u16;
-
-const WALLPAPER_ICON_FILE: &'static str = "walls_and_floors.png";
-const WALLPAPER_FLOORING_ICON_WIDTH: u16 = 28u16;
-const WALLPAPER_FLOORING_ICON_HEIGHT: u16 = 26u16;
-const WALLPAPER_WALLPAPER_ICON_WIDTH: u16 = 16u16;
-const WALLPAPER_WALLPAPER_ICON_HEIGHT: u16 = 28u16;
-const WALLPAPER_FLOORING_ICONS_PER_ROW: u16 = 8u16;
-const WALLPAPER_WALLPAPER_ICONS_PER_ROW: u16 = 16u16;
-const WALLPAPER_FLOORING_ICON_X_MULTIPLIER: u16 = 32u16;
-const WALLPAPER_FLOORING_ICON_Y_MULTIPLIER: u16 = 32u16;
-const WALLPAPER_WALLPAPER_ICON_X_MULTIPLIER: u16 = 16u16;
-const WALLPAPER_WALLPAPER_ICON_Y_MULTIPLIER: u16 = 48u16;
-const WALLPAPER_FLOORING_ICON_Y_OFFSET: u16 = 336u16;
-const WALLPAPER_WALLPAPER_ICON_Y_OFFSET: u16 = 8u16;
-const WALLPAPER_ICON_SHEET_WIDTH: u16 = 256u16;
-const WALLPAPER_ICON_SHEET_HEIGHT: u16 = 560u16;
-
 #[derive(Clone, Copy, PartialEq)]
 pub enum Implementation {
     TravelingCart,
@@ -105,33 +63,31 @@ impl Item {
     pub fn sprite(&self, id: u16) -> TableValue {
         match self {
             Self::ObjectInformation(_) => TableValue::Sprite(
-                AttrValue::from(OBJECT_INFORMATION_ICON_FILE),
-                (id % OBJECT_INFORMATION_ICONS_PER_ROW) * OBJECT_INFORMATION_ICON_SIZE,
-                (id / OBJECT_INFORMATION_ICONS_PER_ROW) * OBJECT_INFORMATION_ICON_SIZE,
-                OBJECT_INFORMATION_ICON_SIZE,
-                OBJECT_INFORMATION_ICON_SIZE,
-                OBJECT_INFORMATION_ICON_SHEET_WIDTH,
-                OBJECT_INFORMATION_ICON_SHEET_HEIGHT,
+                AttrValue::from("springobjects.png"),
+                (id % 24u16) * 16u16,
+                (id / 24u16) * 16u16,
+                16u16,
+                16u16,
+                384u16,
+                624u16,
             ),
             Self::BigCraftablesInformation(_) => TableValue::Sprite(
-                AttrValue::from(BIG_CRAFTABLES_INFORMATION_ICON_FILE),
-                (id % BIG_CRAFTABLES_INFORMATION_ICONS_PER_ROW)
-                    * BIG_CRAFTABLES_INFORMATION_ICON_WIDTH,
-                (id / BIG_CRAFTABLES_INFORMATION_ICONS_PER_ROW)
-                    * BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT,
-                BIG_CRAFTABLES_INFORMATION_ICON_WIDTH,
-                BIG_CRAFTABLES_INFORMATION_ICON_HEIGHT,
-                BIG_CRAFTABLES_INFORMATION_ICON_SHEET_WIDTH,
-                BIG_CRAFTABLES_INFORMATION_ICON_SHEET_HEIGHT,
+                AttrValue::from("Craftables.png"),
+                (id % 8u16) * 16u16,
+                (id / 8u16) * 32u16,
+                16u16,
+                32u16,
+                128u16,
+                1152u16,
             ),
             Self::Furniture(furniture) => TableValue::Sprite(
-                AttrValue::from(FURNITURE_ICON_FILE),
-                (id % FURNITURE_ICON_UNITS_PER_ROW) * FURNITURE_ICON_UNIT,
-                (id / FURNITURE_ICON_UNITS_PER_ROW) * FURNITURE_ICON_UNIT,
-                furniture.source_rectangle_width as u16 * FURNITURE_ICON_UNIT,
-                furniture.source_rectangle_height as u16 * FURNITURE_ICON_UNIT,
-                FURNITURE_ICON_SHEET_WIDTH,
-                FURNITURE_ICON_SHEET_HEIGHT,
+                AttrValue::from("furniture.png"),
+                (id % 32u16) * 16u16,
+                (id / 32u16) * 16u16,
+                furniture.source_rectangle_width as u16 * 16u16,
+                furniture.source_rectangle_height as u16 * 16u16,
+                512u16,
+                1488u16,
             ),
             Self::ClothingInformation(clothing_information) => {
                 let index: u16 = match clothing_information.name {
@@ -140,39 +96,33 @@ impl Item {
                 };
 
                 TableValue::Sprite(
-                    AttrValue::from(CLOTHING_INFORMATION_ICON_FILE),
-                    (index % CLOTHING_INFORMATION_ICONS_PER_ROW) * CLOTHING_INFORMATION_ICON_SIZE,
-                    (index / CLOTHING_INFORMATION_ICONS_PER_ROW)
-                        * CLOTHING_INFORMATION_ICON_SIZE
-                        * CLOTHING_INFORMATION_ICON_Y_MULTIPLIER,
-                    CLOTHING_INFORMATION_ICON_SIZE,
-                    CLOTHING_INFORMATION_ICON_SIZE,
-                    CLOTHING_INFORMATION_ICON_SHEET_WIDTH,
-                    CLOTHING_INFORMATION_ICON_SHEET_HEIGHT,
+                    AttrValue::from("shirts.png"),
+                    (index % 16u16) * 8u16,
+                    (index / 16u16) * 8u16 * 4u16,
+                    8u16,
+                    8u16,
+                    256u16,
+                    608u16,
                 )
             }
             Self::Wallpaper(flooring) => match flooring {
                 true => TableValue::Sprite(
-                    AttrValue::from(WALLPAPER_ICON_FILE),
-                    (id % WALLPAPER_FLOORING_ICONS_PER_ROW) * WALLPAPER_FLOORING_ICON_X_MULTIPLIER,
-                    (id / WALLPAPER_FLOORING_ICONS_PER_ROW) * WALLPAPER_FLOORING_ICON_Y_MULTIPLIER
-                        + WALLPAPER_FLOORING_ICON_Y_OFFSET,
-                    WALLPAPER_FLOORING_ICON_WIDTH,
-                    WALLPAPER_FLOORING_ICON_HEIGHT,
-                    WALLPAPER_ICON_SHEET_WIDTH,
-                    WALLPAPER_ICON_SHEET_HEIGHT,
+                    AttrValue::from("walls_and_floors.png"),
+                    (id % 8u16) * 32u16,
+                    (id / 8u16) * 32u16 + 336u16,
+                    28u16,
+                    26u16,
+                    256u16,
+                    560u16,
                 ),
                 false => TableValue::Sprite(
-                    AttrValue::from(WALLPAPER_ICON_FILE),
-                    (id % WALLPAPER_WALLPAPER_ICONS_PER_ROW)
-                        * WALLPAPER_WALLPAPER_ICON_X_MULTIPLIER,
-                    (id / WALLPAPER_WALLPAPER_ICONS_PER_ROW)
-                        * WALLPAPER_WALLPAPER_ICON_Y_MULTIPLIER
-                        + WALLPAPER_WALLPAPER_ICON_Y_OFFSET,
-                    WALLPAPER_WALLPAPER_ICON_WIDTH,
-                    WALLPAPER_WALLPAPER_ICON_HEIGHT,
-                    WALLPAPER_ICON_SHEET_WIDTH,
-                    WALLPAPER_ICON_SHEET_HEIGHT,
+                    AttrValue::from("walls_and_floors.png"),
+                    (id % 16u16) * 16u16,
+                    (id / 16u16) * 48u16 + 8u16,
+                    16u16,
+                    28u16,
+                    256u16,
+                    560u16,
                 ),
             },
         }
