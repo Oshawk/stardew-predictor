@@ -223,7 +223,7 @@ fn load<T: Debug + FromValueSplit>(
             // Clothing has some negative keys.
             match key.parse::<u16>() {
                 Ok(key) => key,
-                Err(_) => u16::MAX - (-key.parse::<i16>().unwrap() as u16),  // This is very much a hack, but changing everything to i16 would require major changes.
+                Err(_) => u16::MAX - (-key.parse::<i16>().unwrap() as u16), // This is very much a hack, but changing everything to i16 would require major changes.
             },
             T::from_value_split(&value_split),
         );

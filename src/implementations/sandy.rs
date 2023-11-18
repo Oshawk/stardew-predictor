@@ -7,7 +7,9 @@ use crate::components::stock_table::{StockTable, StockTableTrait};
 use crate::components::table::TableCell;
 use crate::configuration::Configuration;
 use crate::implementations::util::Item::ObjectInformation;
-use crate::implementations::util::{day_number, get_clothing_information, get_prng, Item, stock_items_rows, StockItem};
+use crate::implementations::util::{
+    day_number, get_clothing_information, get_prng, stock_items_rows, Item, StockItem,
+};
 use crate::prng::Prng;
 
 const NON_FILTER_ITERATIONS: u16 = 28u16;
@@ -35,17 +37,15 @@ impl StockTableTrait for SandyImpl {
             let mut prng: Box<dyn Prng> =
                 get_prng(configuration.platform, configuration.seed / 2i32 + date)?;
 
-            let mut stock_items: Vec<StockItem> = vec![
-                {
-                    let id: u16 = 1000u16 + prng.gen_range(0i32..127i32)? as u16;
-                    StockItem {
-                        id,
-                        item: Item::ClothingInformation(get_clothing_information(id)?),
-                        price: 700u32,
-                        quantity: 1u8,
-                    }
+            let mut stock_items: Vec<StockItem> = vec![{
+                let id: u16 = 1000u16 + prng.gen_range(0i32..127i32)? as u16;
+                StockItem {
+                    id,
+                    item: Item::ClothingInformation(get_clothing_information(id)?),
+                    price: 700u32,
+                    quantity: 1u8,
                 }
-            ];
+            }];
 
             if day_number(date) % 7u8 == 1u8 {
                 let id: u16 = 2734u16 + prng.gen_range(0i32..4i32)? as u16 * 2u16;

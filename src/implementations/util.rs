@@ -1,7 +1,10 @@
 use anyhow::{Context, Result};
 use yew::prelude::*;
 
-use crate::codegen::{BigCraftablesInformation, CLOTHING_INFORMATION, Furniture, ObjectInformation, FURNITURE, FURNITURE_OFF_LIMIT, ClothingInformation};
+use crate::codegen::{
+    BigCraftablesInformation, ClothingInformation, Furniture, ObjectInformation,
+    CLOTHING_INFORMATION, FURNITURE, FURNITURE_OFF_LIMIT,
+};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::configuration::Platform;
 use crate::prng::{Jkiss, MsCorLibRandom, Prng};
@@ -25,7 +28,7 @@ const FURNITURE_ICON_UNITS_PER_ROW: u16 = 32u16;
 const FURNITURE_ICON_SHEET_WIDTH: u16 = 512u16;
 const FURNITURE_ICON_SHEET_HEIGHT: u16 = 1488u16;
 
-const CLOTHING_INFORMATION_ICON_FILE: &'static str = "shirts.png";  // This may need to change if other clothing types are sold.
+const CLOTHING_INFORMATION_ICON_FILE: &'static str = "shirts.png"; // This may need to change if other clothing types are sold.
 const CLOTHING_INFORMATION_ICON_SIZE: u16 = 8u16;
 const CLOTHING_INFORMATION_ICONS_PER_ROW: u16 = 16u16;
 const CLOTHING_INFORMATION_ICON_Y_MULTIPLIER: u16 = 4u16;
@@ -61,9 +64,15 @@ impl Item {
     pub fn name(&self, id: u16) -> String {
         match self {
             Self::ObjectInformation(object_information) => object_information.name.to_string(),
-            Self::BigCraftablesInformation(big_craftable_information) => big_craftable_information.name.to_string(),
+            Self::BigCraftablesInformation(big_craftable_information) => {
+                big_craftable_information.name.to_string()
+            }
             Self::Furniture(furniture) => furniture.name.to_string(),
-            Self::ClothingInformation(clothing_information) => format!("{} ({})", clothing_information.name, if id >= 1000u16 { id - 1000u16 } else {id}),
+            Self::ClothingInformation(clothing_information) => format!(
+                "{} ({})",
+                clothing_information.name,
+                if id >= 1000u16 { id - 1000u16 } else { id }
+            ),
         }
     }
 
@@ -71,10 +80,8 @@ impl Item {
         match self {
             Self::ObjectInformation(_) => TableValue::Sprite(
                 AttrValue::from(OBJECT_INFORMATION_ICON_FILE),
-                (id % OBJECT_INFORMATION_ICONS_PER_ROW)
-                    * OBJECT_INFORMATION_ICON_SIZE,
-                (id / OBJECT_INFORMATION_ICONS_PER_ROW)
-                    * OBJECT_INFORMATION_ICON_SIZE,
+                (id % OBJECT_INFORMATION_ICONS_PER_ROW) * OBJECT_INFORMATION_ICON_SIZE,
+                (id / OBJECT_INFORMATION_ICONS_PER_ROW) * OBJECT_INFORMATION_ICON_SIZE,
                 OBJECT_INFORMATION_ICON_SIZE,
                 OBJECT_INFORMATION_ICON_SIZE,
                 OBJECT_INFORMATION_ICON_SHEET_WIDTH,
@@ -102,16 +109,16 @@ impl Item {
             ),
             Self::ClothingInformation(clothing_information) => {
                 let index: u16 = match clothing_information.name {
-                    "Shirt" => id - 1000u16,  // The generic shirt.
-                    _ => clothing_information.male_index
+                    "Shirt" => id - 1000u16, // The generic shirt.
+                    _ => clothing_information.male_index,
                 };
 
                 TableValue::Sprite(
                     AttrValue::from(CLOTHING_INFORMATION_ICON_FILE),
-                    (index % CLOTHING_INFORMATION_ICONS_PER_ROW)
-                        * CLOTHING_INFORMATION_ICON_SIZE,
+                    (index % CLOTHING_INFORMATION_ICONS_PER_ROW) * CLOTHING_INFORMATION_ICON_SIZE,
                     (index / CLOTHING_INFORMATION_ICONS_PER_ROW)
-                        * CLOTHING_INFORMATION_ICON_SIZE * CLOTHING_INFORMATION_ICON_Y_MULTIPLIER,
+                        * CLOTHING_INFORMATION_ICON_SIZE
+                        * CLOTHING_INFORMATION_ICON_Y_MULTIPLIER,
                     CLOTHING_INFORMATION_ICON_SIZE,
                     CLOTHING_INFORMATION_ICON_SIZE,
                     CLOTHING_INFORMATION_ICON_SHEET_WIDTH,
@@ -192,7 +199,13 @@ pub fn stock_items_rows(
 ) -> Option<Vec<Vec<TableCell>>> {
     let mut rows: Vec<Vec<TableCell>> = stock_items
         .iter()
-        .filter(|stock_item: &&StockItem| stock_item.item.name(stock_item.id).to_lowercase().contains(filter))
+        .filter(|stock_item: &&StockItem| {
+            stock_item
+                .item
+                .name(stock_item.id)
+                .to_lowercase()
+                .contains(filter)
+        })
         .map(|stock_item: &StockItem| {
             let mut row: Vec<TableCell> = Vec::new();
             row.push(TableCell {
@@ -262,9 +275,13 @@ pub fn get_clothing_information(id: u16) -> Result<&'static ClothingInformation>
         Some(item) => item,
         None => {
             if id >= 1000u16 {
-                CLOTHING_INFORMATION.get(&(u16::MAX - 2u16)).context("Error getting clothing information.")?
+                CLOTHING_INFORMATION
+                    .get(&(u16::MAX - 2u16))
+                    .context("Error getting clothing information.")?
             } else {
-                CLOTHING_INFORMATION.get(&(u16::MAX - 1u16)).context("Error getting clothing information.")?
+                CLOTHING_INFORMATION
+                    .get(&(u16::MAX - 1u16))
+                    .context("Error getting clothing information.")?
             }
         }
     })
