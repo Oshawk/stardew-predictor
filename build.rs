@@ -3,7 +3,6 @@ use std::env;
 use std::fmt::Debug;
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
 use std::str::Split;
 
@@ -199,7 +198,7 @@ impl FromValueSplit for ClothingInformation {
             rgb: (
                 rgb_split.next().unwrap().parse::<u8>().unwrap(),
                 rgb_split.next().unwrap().parse::<u8>().unwrap(),
-                rgb_split.next().unwrap().parse::<u8>().unwrap()
+                rgb_split.next().unwrap().parse::<u8>().unwrap(),
             ),
             dyeable: value_split[7usize].parse::<bool>().unwrap(),
             type_: value_split[8usize].to_string(),
@@ -221,9 +220,10 @@ fn load<T: Debug + FromValueSplit>(
     for (key, value) in json.get("content").unwrap().as_object().unwrap() {
         let value_split: Vec<&str> = value.as_str().unwrap().split("/").collect();
         map.insert(
-            match key.parse::<u16>() {  // Clothing has some negative keys.
+            // Clothing has some negative keys.
+            match key.parse::<u16>() {
                 Ok(key) => key,
-                Err(_) => continue,
+                Err(_) => u16::MAX - (-key.parse::<i16>().unwrap() as u16),  // This is very much a hack, but changing everything to i16 would require major changes.
             },
             T::from_value_split(&value_split),
         );

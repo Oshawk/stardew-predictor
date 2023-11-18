@@ -1,22 +1,22 @@
 use anyhow::{Context, Result};
 use yew::prelude::*;
 
-use crate::codegen::OBJECT_INFORMATION;
+use crate::codegen::{CLOTHING_INFORMATION, FURNITURE, OBJECT_INFORMATION};
 use crate::components::message::{Message, MessageColour};
 use crate::components::stock_table::{StockTable, StockTableTrait};
 use crate::components::table::TableCell;
 use crate::configuration::Configuration;
 use crate::implementations::util::Item::ObjectInformation;
-use crate::implementations::util::{day_number, get_prng, stock_items_rows, StockItem};
+use crate::implementations::util::{day_number, get_clothing_information, get_prng, Item, stock_items_rows, StockItem};
 use crate::prng::Prng;
 
-const NON_FILTER_ITERATIONS: u16 = 112u16;
+const NON_FILTER_ITERATIONS: u16 = 28u16;
 const FILTER_ITERATIONS: u16 = 1120u16;
 const FILTER_DAYS: u8 = 8u8;
 
-pub struct KrobusImpl {}
+pub struct SandyImpl {}
 
-impl StockTableTrait for KrobusImpl {
+impl StockTableTrait for SandyImpl {
     fn get_stock(
         configuration: &Configuration,
         date: i32,
@@ -31,46 +31,31 @@ impl StockTableTrait for KrobusImpl {
         let mut table: Vec<Vec<TableCell>> = Vec::new();
         for iteration in 0u16..iterations {
             let date: i32 = date + iteration as i32;
-            match day_number(date) % 7u8 {
-                2u8 | 5u8 => {}
-                _ => continue,
-            }
 
             let mut prng: Box<dyn Prng> =
                 get_prng(configuration.platform, configuration.seed / 2i32 + date)?;
 
-            let stock_items: Vec<StockItem> = vec![match day_number(date) % 7u8 {
-                2u8 => {
-                    let id = prng.gen_range(698i32..709i32)? as u16;
+            let mut stock_items: Vec<StockItem> = vec![
+                {
+                    let id: u16 = 1000u16 + prng.gen_range(0i32..127i32)? as u16;
                     StockItem {
                         id,
-                        item: ObjectInformation(
-                            OBJECT_INFORMATION
-                                .get(&id)
-                                .context("Error getting object information.")?,
-                        ),
-                        price: 200u32,
-                        quantity: 5u8,
+                        item: Item::ClothingInformation(get_clothing_information(id)?),
+                        price: 700u32,
+                        quantity: 1u8,
                     }
                 }
-                5u8 => {
-                    let mut id = prng.gen_range(194i32..245i32)? as u16;
-                    if id == 217u16 {
-                        id = 216u16;
-                    }
-                    StockItem {
-                        id,
-                        item: ObjectInformation(
-                            OBJECT_INFORMATION
-                                .get(&id)
-                                .context("Error getting object information.")?,
-                        ),
-                        price: prng.gen_range(5i32..51i32)? as u32 * 10u32,
-                        quantity: 5u8,
-                    }
-                }
-                _ => panic!(),
-            }];
+            ];
+
+            if day_number(date) % 7u8 == 1u8 {
+                let id: u16 = 2734u16 + prng.gen_range(0i32..4i32)? as u16 * 2u16;
+                stock_items.push(StockItem {
+                    id,
+                    item: Item::Furniture(FURNITURE.get(&id).context("Error getting furniture.")?),
+                    price: 500u32,
+                    quantity: 1u8,
+                })
+            }
 
             match stock_items_rows(&stock_items, date, filter) {
                 Some(rows) => {
@@ -91,7 +76,7 @@ impl StockTableTrait for KrobusImpl {
     fn get_messages(configuration: &Configuration) -> Html {
         html!(
             <>
-                <Message colour={ MessageColour::Info } body="Random stock from Krobus." />
+                <Message colour={ MessageColour::Info } body="Random stock from Sandy." />
                 {
                     match configuration.date {
                         Some(_) => html!(),
@@ -104,13 +89,13 @@ impl StockTableTrait for KrobusImpl {
 }
 
 #[derive(Properties, PartialEq)]
-pub struct KrobusProperties {
+pub struct SandyProperties {
     pub configuration: Configuration,
 }
 
 #[function_component]
-pub fn Krobus(properties: &KrobusProperties) -> Html {
+pub fn Sandy(properties: &SandyProperties) -> Html {
     html! {
-        <StockTable<KrobusImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />
+        <StockTable<SandyImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />
     }
 }

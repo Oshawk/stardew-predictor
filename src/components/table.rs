@@ -15,7 +15,7 @@ impl ToHtml for TableValue {
             TableValue::None => html!(),
             TableValue::String(string) => html!({ string }),
             TableValue::Sprite(image, x, y, width, height, sheet_width, sheet_height) => html!(
-                <figure class={ format!("image") } style={ format!("background: url(/assets/{image}) calc(-{x}px * ({SPRITE_HEIGHT} / {height})) calc(-{y}px * ({SPRITE_HEIGHT} / {height})) / calc({sheet_width}px * ({SPRITE_HEIGHT} / {height})) calc({sheet_height}px * ({SPRITE_HEIGHT} / {height})); width: calc({width}px * ({SPRITE_HEIGHT} / {height})); height: calc({height}px * ({SPRITE_HEIGHT} / {height})); display: inline-block;") } />
+                <figure class={ format!("image") } style={ format!("background: url(/assets/{image}) calc(-{x}px * ({SPRITE_HEIGHT} / {height})) calc(-{y}px * ({SPRITE_HEIGHT} / {height})) / calc({sheet_width}px * ({SPRITE_HEIGHT} / {height})) calc({sheet_height}px * ({SPRITE_HEIGHT} / {height})); width: calc({width}px * ({SPRITE_HEIGHT} / {height})); height: calc({height}px * ({SPRITE_HEIGHT} / {height})); image-rendering: pixelated; display: inline-block;") } />
             ),
         }
     }
