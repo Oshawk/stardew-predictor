@@ -21,11 +21,10 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Install binstall
-        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-
       - name: Install trunk
-        run: cargo binstall trunk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
 
       - name: Build
         run: trunk build --public-url . --release
