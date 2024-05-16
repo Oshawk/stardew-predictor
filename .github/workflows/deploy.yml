@@ -19,6 +19,7 @@ jobs:
       - name: Get branch names
         id: branches
         run: echo "branches=$(git branch -r --format '%(refname:lstrip=3)' | grep version/ | jq -cRn '[inputs]')" > "$GITHUB_OUTPUT"
+      - run: cat "$GITHUB_OUTPUT"
 
   get-artifacts:
     needs:
