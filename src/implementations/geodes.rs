@@ -1,4 +1,4 @@
-use crate::codegen::{ObjectInformation, ObjectInformationExtra, OBJECT_INFORMATION};
+use crate::codegen::{HATS, ObjectInformation, ObjectInformationExtra, OBJECT_INFORMATION};
 use anyhow::{Context, Result};
 use std::cmp::max;
 use yew::prelude::*;
@@ -195,14 +195,9 @@ fn get_geodes(
                             if prng.gen_float()? < 0.05f64
                                 && !configuration.golden_helmet.unwrap_or(true)
                             {
-                                // todo!("Hat")
                                 Geode {
-                                    id: 69u16,
-                                    item: Item::ObjectInformation(
-                                        OBJECT_INFORMATION
-                                            .get(&69u16)
-                                            .context("Error getting object information.")?,
-                                    ),
+                                    id: 75u16,
+                                    item: Item::Hats(HATS.get(&75u16).context("Error getting hats.")?),
                                     quantity: 1u8,
                                 }
                             } else {

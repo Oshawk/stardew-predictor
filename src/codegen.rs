@@ -48,6 +48,14 @@ pub struct ClothingInformation {
     pub type_: &'static str,
 }
 
+pub struct Hats {
+    pub name: &'static str,
+    pub description: &'static str,
+    pub hair_draw_type: u8,
+    pub ignore_hairstyle_offset: bool,
+    pub is_prismatic: bool,
+}
+
 include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 pub static OBJECT_INFORMATION_OFF_LIMIT: phf::Set<u16> = phf::phf_set!(

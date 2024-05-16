@@ -15,7 +15,7 @@ enum ObjectInformationExtra {
     Treasure(Vec<u16>),
 }
 
-impl Debug for  ObjectInformationExtra {
+impl Debug for ObjectInformationExtra {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             ObjectInformationExtra::None => write!(f, "ObjectInformationExtra::None"),
@@ -227,6 +227,46 @@ impl FromValueSplit for ClothingInformation {
     }
 }
 
+#[derive(Debug)]
+struct Hats {
+    pub name: String,
+    pub description: String,
+    pub hair_draw_type: u8,
+    pub ignore_hairstyle_offset: bool,
+    pub is_prismatic: bool,
+}
+
+impl FromValueSplit for Hats {
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
+        let hair_draw_type: u8 = match value_split[2usize] {
+            "true" => 0u8,
+            "false" => 1u8,
+            "hide" => 2u8,
+            _ => panic!(),
+        };
+
+        let mut is_prismatic = false;
+        if value_split.len() > 4 {
+            for special_tag in value_split[4usize].split(" ") {
+                match special_tag {
+                    "Prismatic" => {
+                        is_prismatic = true;
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        Self {
+            name: value_split[0usize].to_string(),
+            description: value_split[1usize].to_string(),
+            hair_draw_type,
+            ignore_hairstyle_offset: value_split[3usize].parse::<bool>().unwrap(),
+            is_prismatic,
+        }
+    }
+}
+
 fn load<T: Debug + FromValueSplit>(
     out_file: &mut BufWriter<File>,
     path: &Path,
@@ -295,4 +335,7 @@ fn main() {
         "CLOTHING_INFORMATION",
         "ClothingInformation",
     );
+
+    let hats_path: &Path = Path::new("assets/hats.json");
+    load::<Hats>(&mut out_file, hats_path, "HATS", "Hats");
 }

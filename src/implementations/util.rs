@@ -2,10 +2,7 @@ use anyhow::{Context, Result};
 use std::fmt::Display;
 use yew::prelude::*;
 
-use crate::codegen::{
-    BigCraftablesInformation, ClothingInformation, Furniture, ObjectInformation,
-    CLOTHING_INFORMATION, FURNITURE, FURNITURE_OFF_LIMIT,
-};
+use crate::codegen::{BigCraftablesInformation, ClothingInformation, Furniture, ObjectInformation, CLOTHING_INFORMATION, FURNITURE, FURNITURE_OFF_LIMIT, Hats};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::configuration::Platform;
 use crate::prng::{Jkiss, MsCorLibRandom, Prng};
@@ -43,6 +40,7 @@ pub enum Item {
     Furniture(&'static Furniture),
     ClothingInformation(&'static ClothingInformation),
     Wallpaper(bool),
+    Hats(&'static Hats),
 }
 
 impl Item {
@@ -63,6 +61,7 @@ impl Item {
                 if *flooring { "Flooring" } else { "Wallpaper" },
                 id,
             ),
+            Self::Hats(hats) => hats.name.to_string(),
         }
     }
 
@@ -131,6 +130,15 @@ impl Item {
                     560u16,
                 ),
             },
+            Self::Hats(hats) => TableValue::Sprite(
+                AttrValue::from("hats.png"),
+                (id % 12u16) * 20u16,
+                (id / 12u16) * 20u16 * 4u16,
+                20u16,
+                20u16,
+                240u16,
+                640u16,
+            ),
         }
     }
 }
