@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: pages
+          fetch-depth: 0
 
       - name: Get branch names
         id: branches
