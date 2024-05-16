@@ -54,7 +54,7 @@ impl StockTableTrait for SandyImpl {
                     item: Item::Furniture(FURNITURE.get(&id).context("Error getting furniture.")?),
                     price: 500u32,
                     quantity: 1u8,
-                })
+                });
             }
 
             match stock_items_rows(&stock_items, date, filter) {

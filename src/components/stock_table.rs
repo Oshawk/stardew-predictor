@@ -7,9 +7,37 @@ use crate::components::date_jump::DateJump;
 use crate::components::filter::Filter;
 use crate::components::message::{Message, MessageColour};
 use crate::components::navigation::{Navigation, NavigationDirection};
-use crate::components::table::{Table, TableCell};
-use crate::components::util::stock_items_table_header;
+use crate::components::table::{Table, TableAlign, TableCell, TableValue};
 use crate::configuration::Configuration;
+
+pub fn stock_items_table_header() -> Vec<Vec<TableCell>> {
+    vec![vec![
+        TableCell {
+            value: TableValue::String(AttrValue::from("Date")),
+            align: TableAlign::MiddleLeft,
+            rows: 1u8,
+            columns: 1u8,
+        },
+        TableCell {
+            value: TableValue::String(AttrValue::from("Item")),
+            align: TableAlign::MiddleLeft,
+            rows: 1u8,
+            columns: 2u8,
+        },
+        TableCell {
+            value: TableValue::String(AttrValue::from("Price")),
+            align: TableAlign::MiddleLeft,
+            rows: 1u8,
+            columns: 1u8,
+        },
+        TableCell {
+            value: TableValue::String(AttrValue::from("Quantity")),
+            align: TableAlign::MiddleLeft,
+            rows: 1u8,
+            columns: 1u8,
+        },
+    ]]
+}
 
 pub trait StockTableTrait {
     fn get_stock(
@@ -55,7 +83,7 @@ pub fn StockTable<T: StockTableTrait>(properties: &StockTableProperties) -> Html
                 NavigationDirection::Forward => {
                     date.set(**date + navigation_step);
                 }
-            };
+            }
         },
     );
 

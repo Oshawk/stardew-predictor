@@ -1,3 +1,8 @@
+pub enum ObjectInformationExtra {
+    None,
+    Treasure(&'static [u16]),
+}
+
 pub struct ObjectInformation {
     pub name: &'static str,
     pub price: u32,
@@ -5,6 +10,7 @@ pub struct ObjectInformation {
     pub type_and_category: &'static str,
     pub display_name: &'static str,
     pub description: &'static str,
+    pub extra: ObjectInformationExtra,
 }
 
 pub struct BigCraftablesInformation {

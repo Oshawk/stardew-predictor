@@ -30,7 +30,7 @@ pub fn DateJump(properties: &DateJumpProperties) -> Html {
                 Err(_) => {
                     year.set(None);
                 }
-            };
+            }
         })
     };
 
@@ -44,7 +44,7 @@ pub fn DateJump(properties: &DateJumpProperties) -> Html {
                 season.set(Some(season_ as u8));
             } else {
                 season.set(None);
-            };
+            }
         })
     };
 
@@ -66,7 +66,7 @@ pub fn DateJump(properties: &DateJumpProperties) -> Html {
                 Err(_) => {
                     day.set(None);
                 }
-            };
+            }
         })
     };
 

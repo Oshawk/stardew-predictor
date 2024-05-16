@@ -1,13 +1,27 @@
 use std::collections::HashMap;
 use std::env;
-use std::fmt::Debug;
+use std::fmt::{Debug, Formatter, Pointer};
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::str::Split;
 
 trait FromValueSplit {
-    fn from_value_split(value_split: &Vec<&str>) -> Self;
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self;
+}
+
+enum ObjectInformationExtra {
+    None,
+    Treasure(Vec<u16>),
+}
+
+impl Debug for  ObjectInformationExtra {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ObjectInformationExtra::None => write!(f, "ObjectInformationExtra::None"),
+            ObjectInformationExtra::Treasure(treasure) => write!(f, "ObjectInformationExtra::Treasure(&{:?})", treasure),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -18,10 +32,16 @@ struct ObjectInformation {
     pub type_and_category: String,
     pub display_name: String,
     pub description: String,
+    pub extra: ObjectInformationExtra,
 }
 
 impl FromValueSplit for ObjectInformation {
-    fn from_value_split(value_split: &Vec<&str>) -> Self {
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
+        let extra: ObjectInformationExtra = match id {
+            535u16 | 536u16 | 537u16 | 749u16 | 275u16 => ObjectInformationExtra::Treasure(value_split[6usize].split(" ").map(|treasure: &str| treasure.parse::<u16>().unwrap()).collect()),
+            _ => ObjectInformationExtra::None,
+        };
+
         Self {
             name: value_split[0usize].to_string(),
             price: value_split[1usize].parse::<u32>().unwrap(),
@@ -29,6 +49,7 @@ impl FromValueSplit for ObjectInformation {
             type_and_category: value_split[3usize].to_string(),
             display_name: value_split[4usize].to_string(),
             description: value_split[5usize].to_string(),
+            extra,
         }
     }
 }
@@ -47,7 +68,7 @@ struct BigCraftablesInformation {
 }
 
 impl FromValueSplit for BigCraftablesInformation {
-    fn from_value_split(value_split: &Vec<&str>) -> Self {
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
         Self {
             name: value_split[0usize].to_string(),
             price: value_split[1usize].parse::<u32>().unwrap(),
@@ -94,7 +115,7 @@ impl FromValueSplit for Furniture {
     // 15 = bed...
     // 16 = torch
     // 17 = sconce
-    fn from_value_split(value_split: &Vec<&str>) -> Self {
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
         let type_: &str = value_split[1usize];
 
         let (source_rectangle_width, source_rectangle_height): (u8, u8) = match value_split[2usize]
@@ -179,7 +200,7 @@ struct ClothingInformation {
 }
 
 impl FromValueSplit for ClothingInformation {
-    fn from_value_split(value_split: &Vec<&str>) -> Self {
+    fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
         let male_index: u16 = value_split[3usize].parse::<u16>().unwrap();
         let female_index: u16 = match value_split[4usize] {
             "-1" => male_index,
@@ -218,20 +239,21 @@ fn load<T: Debug + FromValueSplit>(
     let mut map: HashMap<u16, T> = HashMap::new();
 
     for (key, value) in json.get("content").unwrap().as_object().unwrap() {
+        let id: u16 = match key.parse::<u16>() {
+            Ok(key) => key,
+            Err(_) => u16::MAX - (-key.parse::<i16>().unwrap() as u16), // This is very much a hack, but changing everything to i16 would require major changes.
+        };
         let value_split: Vec<&str> = value.as_str().unwrap().split("/").collect();
         map.insert(
             // Clothing has some negative keys.
-            match key.parse::<u16>() {
-                Ok(key) => key,
-                Err(_) => u16::MAX - (-key.parse::<i16>().unwrap() as u16), // This is very much a hack, but changing everything to i16 would require major changes.
-            },
-            T::from_value_split(&value_split),
+            id,
+            T::from_value_split(id, &value_split),
         );
     }
 
     let mut builder: phf_codegen::Map<u16> = phf_codegen::Map::new();
     for (key, value) in &map {
-        builder.entry(key.clone(), format!("{:?}", value).as_str());
+        builder.entry(*key, format!("{:?}", value).as_str());
     }
 
     writeln!(

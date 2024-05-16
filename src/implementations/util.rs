@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use std::fmt::Display;
 use yew::prelude::*;
 
 use crate::codegen::{
@@ -16,18 +17,23 @@ pub enum Implementation {
     Sandy,
     Pierre,
     Joja,
+    Geodes,
 }
 
-impl ToString for Implementation {
-    fn to_string(&self) -> String {
-        match self {
-            Self::TravelingCart => "Traveling Cart",
-            Self::Krobus => "Krobus",
-            Self::Sandy => "Sandy",
-            Self::Pierre => "Pierre",
-            Self::Joja => "Joja",
-        }
-        .to_string()
+impl Display for Implementation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::TravelingCart => "Traveling Cart",
+                Self::Krobus => "Krobus",
+                Self::Sandy => "Sandy",
+                Self::Pierre => "Pierre",
+                Self::Joja => "Joja",
+                Self::Geodes => "Geodes",
+            }
+        )
     }
 }
 

@@ -1,8 +1,15 @@
+use std::fmt::Display;
 use yew::prelude::*;
 
 #[derive(PartialEq)]
 pub enum MessageColour {
+    // $colors in derived-variables.scss
+    Default,
+    White,
+    Black,
+    Light,
     Dark,
+    Text,
     Primary,
     Link,
     Info,
@@ -11,18 +18,26 @@ pub enum MessageColour {
     Danger,
 }
 
-impl ToString for MessageColour {
-    fn to_string(&self) -> String {
-        match self {
-            MessageColour::Dark => "is-dark",
-            MessageColour::Primary => "is-primary",
-            MessageColour::Link => "is-link",
-            MessageColour::Info => "is-info",
-            MessageColour::Success => "is-success",
-            MessageColour::Warning => "is-warning",
-            MessageColour::Danger => "is-danger",
-        }
-        .to_string()
+impl Display for MessageColour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                MessageColour::Default => "",
+                MessageColour::White => "is-white",
+                MessageColour::Black => "is-black",
+                MessageColour::Light => "is-light",
+                MessageColour::Dark => "is-dark",
+                MessageColour::Text => "is-text",
+                MessageColour::Primary => "is-primary",
+                MessageColour::Link => "is-link",
+                MessageColour::Info => "is-info",
+                MessageColour::Success => "is-success",
+                MessageColour::Warning => "is-warning",
+                MessageColour::Danger => "is-danger",
+            }
+        )
     }
 }
 

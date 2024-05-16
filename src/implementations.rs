@@ -1,3 +1,4 @@
+pub mod geodes;
 pub mod joja;
 pub mod krobus;
 pub mod pierre;

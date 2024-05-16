@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use yew::prelude::*;
 
 const SPRITE_HEIGHT: u8 = 16u8;
@@ -34,20 +35,23 @@ pub enum TableAlign {
     BottomRight,
 }
 
-impl ToString for TableAlign {
-    fn to_string(&self) -> String {
-        match self {
-            TableAlign::TopLeft => "vertical-align: top; text-align: left;",
-            TableAlign::TopCenter => "vertical-align: top; text-align: center;",
-            TableAlign::TopRight => "vertical-align: top; text-align: right;",
-            TableAlign::MiddleLeft => "vertical-align: middle; text-align: left;",
-            TableAlign::MiddleCenter => "vertical-align: middle; text-align: center;",
-            TableAlign::MiddleRight => "vertical-align: middle; text-align: right;",
-            TableAlign::BottomLeft => "vertical-align: bottom; text-align: left;",
-            TableAlign::BottomCenter => "vertical-align: bottom; text-align: center;",
-            TableAlign::BottomRight => "vertical-align: bottom; text-align: right;",
-        }
-        .to_string()
+impl Display for TableAlign {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                TableAlign::TopLeft => "vertical-align: top; text-align: left;",
+                TableAlign::TopCenter => "vertical-align: top; text-align: center;",
+                TableAlign::TopRight => "vertical-align: top; text-align: right;",
+                TableAlign::MiddleLeft => "vertical-align: middle; text-align: left;",
+                TableAlign::MiddleCenter => "vertical-align: middle; text-align: center;",
+                TableAlign::MiddleRight => "vertical-align: middle; text-align: right;",
+                TableAlign::BottomLeft => "vertical-align: bottom; text-align: left;",
+                TableAlign::BottomCenter => "vertical-align: bottom; text-align: center;",
+                TableAlign::BottomRight => "vertical-align: bottom; text-align: right;",
+            }
+        )
     }
 }
 
@@ -58,6 +62,7 @@ pub struct TableCell {
     pub rows: u8,
     pub columns: u8,
 }
+
 #[derive(Properties, PartialEq)]
 pub struct TableProperties {
     pub header: Vec<Vec<TableCell>>,
@@ -67,41 +72,43 @@ pub struct TableProperties {
 #[function_component]
 pub fn Table(properties: &TableProperties) -> Html {
     html!(
-        <table class="table is-fullwidth">
-            <thead>
-                {
-                    properties.header.iter().map(|row|{
-                        html!(
-                            <tr>
-                                {
-                                    row.iter().map(|cell|{
-                                        html!(
-                                            <th style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</th>
-                                        )
-                                    }).collect::<Html>()
-                                }
-                            </tr>
-                        )
-                    }).collect::<Html>()
-                }
-            </thead>
-            <tbody>
-                {
-                    properties.body.iter().map(|row|{
-                        html!(
-                            <tr>
-                                {
-                                    row.iter().map(|cell|{
-                                        html!(
-                                            <td style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</td>
-                                        )
-                                    }).collect::<Html>()
-                                }
-                            </tr>
-                        )
-                    }).collect::<Html>()
-                }
-            </tbody>
-        </table>
+        <div style="overflow-x: scroll;">
+            <table class="table is-fullwidth">
+                <thead>
+                    {
+                        properties.header.iter().map(|row|{
+                            html!(
+                                <tr>
+                                    {
+                                        row.iter().map(|cell|{
+                                            html!(
+                                                <th style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</th>
+                                            )
+                                        }).collect::<Html>()
+                                    }
+                                </tr>
+                            )
+                        }).collect::<Html>()
+                    }
+                </thead>
+                <tbody>
+                    {
+                        properties.body.iter().map(|row|{
+                            html!(
+                                <tr>
+                                    {
+                                        row.iter().map(|cell|{
+                                            html!(
+                                                <td style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</td>
+                                            )
+                                        }).collect::<Html>()
+                                    }
+                                </tr>
+                            )
+                        }).collect::<Html>()
+                    }
+                </tbody>
+            </table>
+        </div>
     )
 }

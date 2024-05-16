@@ -70,7 +70,7 @@ impl Prng for Jkiss {
 }
 
 // https://github.com/microsoft/referencesource/blob/master/mscorlib/system/random.cs
-// The generator doesn't seem to overflow so we don't need to use Wrapping much.
+// The generator doesn't seem to overflow, so we don't need to use Wrapping much.
 pub struct MsCorLibRandom {
     seed: [i32; 56usize],
     n: usize,

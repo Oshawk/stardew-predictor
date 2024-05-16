@@ -3,8 +3,8 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct DropdownProperties<T: Copy + PartialEq + ToString + 'static> {
-    pub items: Vec<T>,
     pub updated: Callback<Option<T>>,
+    pub items: Vec<T>,
     #[prop_or(AttrValue::from("Dropdown"))]
     pub label: AttrValue,
 }
@@ -24,7 +24,7 @@ pub fn Dropdown<T: Copy + PartialEq + ToString + 'static>(
                 updated.emit(Some(*items.get(index as usize - 1usize).unwrap()));
             } else {
                 updated.emit(None);
-            };
+            }
         })
     };
 
