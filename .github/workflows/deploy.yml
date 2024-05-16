@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      branches: ${{ fromJson(steps.branches.outputs.branches) }}
+      branches: ${{ steps.branches.outputs.branches }}
 
     steps:
       - name: Checkout
@@ -28,7 +28,7 @@ jobs:
 
     strategy:
       matrix:
-        branch: ${{ needs.get-branch-names.outputs.branches }}
+        branch: ${{ fromJson(needs.get-branch-names.outputs.branches) }}
     
     steps:
       - name: Download artifact
