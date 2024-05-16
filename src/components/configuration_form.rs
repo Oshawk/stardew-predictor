@@ -1,4 +1,4 @@
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 use yew::prelude::*;
@@ -68,7 +68,6 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
         },
     );
 
-
     let geodes_cracked: Rc<RefCell<Option<u16>>> = use_mut_ref(|| None);
     let geodes_cracked_updated: Callback<Option<u16>> = use_callback(
         geodes_cracked.clone(),
@@ -124,7 +123,17 @@ pub fn ConfigurationForm(properties: &ConfigurationFormProperties) -> Html {
             properties.updated.clone(),
         ),
         move |_: (),
-              (platform, seed, date, geodes_cracked, mine_level, qis_crop, golden_helmet, message, updated): &(
+              (
+            platform,
+            seed,
+            date,
+            geodes_cracked,
+            mine_level,
+            qis_crop,
+            golden_helmet,
+            message,
+            updated,
+        ): &(
             Rc<RefCell<Option<Platform>>>,
             Rc<RefCell<Option<i32>>>,
             Rc<RefCell<Option<i32>>>,

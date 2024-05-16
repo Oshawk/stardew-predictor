@@ -75,14 +75,12 @@ pub fn StockTable<T: StockTableTrait>(properties: &StockTableProperties) -> Html
     let navigation_step: i32 = properties.navigation_step;
     let navigation_updated: Callback<NavigationDirection> = use_callback(
         date.clone(),
-        move |direction: NavigationDirection, date: &UseStateHandle<i32>| {
-            match direction {
-                NavigationDirection::Backward => {
-                    date.set(max(**date - navigation_step, 1i32));
-                }
-                NavigationDirection::Forward => {
-                    date.set(**date + navigation_step);
-                }
+        move |direction: NavigationDirection, date: &UseStateHandle<i32>| match direction {
+            NavigationDirection::Backward => {
+                date.set(max(**date - navigation_step, 1i32));
+            }
+            NavigationDirection::Forward => {
+                date.set(**date + navigation_step);
             }
         },
     );

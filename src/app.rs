@@ -14,22 +14,24 @@ use crate::implementations::util::Implementation;
 #[function_component]
 pub fn App() -> Html {
     let configuration: UseStateHandle<Option<Configuration>> = use_state_eq(|| None);
-    let implementation: UseStateHandle<Option<Implementation>> =
-        use_state_eq(|| None);
+    let implementation: UseStateHandle<Option<Implementation>> = use_state_eq(|| None);
 
     let configuration_updated: Callback<Configuration> = use_callback(
         (configuration.clone(), implementation.clone()),
         move |configuration_: Configuration,
-              (configuration, implementation): &(UseStateHandle<Option<Configuration>>, UseStateHandle<Option<Implementation>>)| {
+              (configuration, implementation): &(
+            UseStateHandle<Option<Configuration>>,
+            UseStateHandle<Option<Implementation>>,
+        )| {
             configuration.set(Some(configuration_));
-            implementation.set(None);  // Resetting the tabs when "Go" is clicked means that all implementatiosn will be created a.new.
+            implementation.set(None); // Resetting the tabs when "Go" is clicked means that all implementatiosn will be created a.new.
         },
     );
 
-
     let implementation_updated: Callback<Implementation> = use_callback(
         implementation.clone(),
-        move |implementation_: Implementation, implementation: &UseStateHandle<Option<Implementation>>| {
+        move |implementation_: Implementation,
+              implementation: &UseStateHandle<Option<Implementation>>| {
             implementation.set(Some(implementation_));
         },
     );

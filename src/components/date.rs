@@ -19,16 +19,14 @@ pub fn Date(properties: &DateProperties) -> Html {
         let year: UseStateHandle<Option<u16>> = year.clone();
         let season: UseStateHandle<Option<u8>> = season.clone();
         let day: UseStateHandle<Option<u8>> = day.clone();
-        move || {
-            match (*year, *season, *day) {
-                (Some(year), Some(season), Some(day)) => {
-                    updated.emit(
-                        Some((year as i32 - 1i32) * 112i32 + (season as i32 - 1i32) * 28 + day as i32),
-                    );
-                }
-                _ => {
-                    updated.emit(None);
-                }
+        move || match (*year, *season, *day) {
+            (Some(year), Some(season), Some(day)) => {
+                updated.emit(Some(
+                    (year as i32 - 1i32) * 112i32 + (season as i32 - 1i32) * 28 + day as i32,
+                ));
+            }
+            _ => {
+                updated.emit(None);
             }
         }
     };

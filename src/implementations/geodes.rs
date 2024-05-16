@@ -1,4 +1,4 @@
-use crate::codegen::{HATS, ObjectInformation, ObjectInformationExtra, OBJECT_INFORMATION};
+use crate::codegen::{ObjectInformation, ObjectInformationExtra, HATS, OBJECT_INFORMATION};
 use anyhow::{Context, Result};
 use std::cmp::max;
 use yew::prelude::*;
@@ -197,7 +197,9 @@ fn get_geodes(
                             {
                                 Geode {
                                     id: 75u16,
-                                    item: Item::Hats(HATS.get(&75u16).context("Error getting hats.")?),
+                                    item: Item::Hats(
+                                        HATS.get(&75u16).context("Error getting hats.")?,
+                                    ),
                                     quantity: 1u8,
                                 }
                             } else {

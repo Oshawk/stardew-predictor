@@ -2,7 +2,10 @@ use anyhow::{Context, Result};
 use std::fmt::Display;
 use yew::prelude::*;
 
-use crate::codegen::{BigCraftablesInformation, ClothingInformation, Furniture, ObjectInformation, CLOTHING_INFORMATION, FURNITURE, FURNITURE_OFF_LIMIT, Hats};
+use crate::codegen::{
+    BigCraftablesInformation, ClothingInformation, Furniture, Hats, ObjectInformation,
+    CLOTHING_INFORMATION, FURNITURE, FURNITURE_OFF_LIMIT,
+};
 use crate::components::table::{TableAlign, TableCell, TableValue};
 use crate::configuration::Platform;
 use crate::prng::{Jkiss, MsCorLibRandom, Prng};

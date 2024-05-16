@@ -19,7 +19,9 @@ impl Debug for ObjectInformationExtra {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             ObjectInformationExtra::None => write!(f, "ObjectInformationExtra::None"),
-            ObjectInformationExtra::Treasure(treasure) => write!(f, "ObjectInformationExtra::Treasure(&{:?})", treasure),
+            ObjectInformationExtra::Treasure(treasure) => {
+                write!(f, "ObjectInformationExtra::Treasure(&{:?})", treasure)
+            }
         }
     }
 }
@@ -38,7 +40,12 @@ struct ObjectInformation {
 impl FromValueSplit for ObjectInformation {
     fn from_value_split(id: u16, value_split: &Vec<&str>) -> Self {
         let extra: ObjectInformationExtra = match id {
-            535u16 | 536u16 | 537u16 | 749u16 | 275u16 => ObjectInformationExtra::Treasure(value_split[6usize].split(" ").map(|treasure: &str| treasure.parse::<u16>().unwrap()).collect()),
+            535u16 | 536u16 | 537u16 | 749u16 | 275u16 => ObjectInformationExtra::Treasure(
+                value_split[6usize]
+                    .split(" ")
+                    .map(|treasure: &str| treasure.parse::<u16>().unwrap())
+                    .collect(),
+            ),
             _ => ObjectInformationExtra::None,
         };
 
