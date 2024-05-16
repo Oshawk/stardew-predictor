@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  get-branch-names:
+    runs-on: ubuntu-latest
+
+    outputs:
+      branches: ${{ fromJson(steps.branches.outputs.branches) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: pages
+
+      - name: Get branch names
+        id: branches
+        run: echo "branches=$(git branch -r --format '%(refname:lstrip=3)' | grep version/ | jq -cRn '[inputs]')" > "$GITHUB_OUTPUT"
+
+  get-artifacts:
+    needs:
+      - get-branch-names
+    
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        branch: ${{ needs.get-branch-names.outputs.branches }}
+    
+    steps:
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: build.yml
+          branch: ${{ matrix.branch }}
+          name: build
+          name_is_regexp: false
+          path: build
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.branch }}
+          path: build
