@@ -24,7 +24,7 @@ jobs:
 
       - name: Get versions
         id: versions
-        run: echo "braversionsnches=$(git branch -r --format '%(refname:lstrip=3)' | sed -nr 's/version\/(.+)/\1/p' | jq -cRn '[inputs]')" >> "$GITHUB_OUTPUT"
+        run: echo "versions=$(git branch -r --format '%(refname:lstrip=3)' | sed -nr 's/version\/(.+)/\1/p' | jq -cRn '[inputs]')" >> "$GITHUB_OUTPUT"
 
   get-artifacts:
     needs:
