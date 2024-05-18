@@ -101,7 +101,7 @@ pub fn Date(properties: &DateProperties) -> Html {
             <div class="control">
                 <div class="field has-addons">
                     <div class="control is-expanded">
-                        <input class="input" oninput={ year_updated } placeholder="Year" type="text" value={ match *year { Some (year) => { year.to_string() }, None => { "".to_string() } } } />
+                        <input class="input" oninput={ day_updated } placeholder="Day" type="text" value={ match *day { Some (day) => { day.to_string() }, None => { "".to_string() } } } />
                     </div>
                     <div class="control">
                         <div class="select">
@@ -115,7 +115,7 @@ pub fn Date(properties: &DateProperties) -> Html {
                         </div>
                     </div>
                     <div class="control is-expanded">
-                        <input class="input" oninput={ day_updated } placeholder="Day" type="text" value={ match *day { Some (day) => { day.to_string() }, None => { "".to_string() } } } />
+                        <input class="input" oninput={ year_updated } placeholder="Year" type="text" value={ match *year { Some (year) => { year.to_string() }, None => { "".to_string() } } } />
                     </div>
                 </div>
             </div>
