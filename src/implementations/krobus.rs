@@ -108,7 +108,7 @@ pub struct KrobusProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn Krobus(properties: &KrobusProperties) -> Html {
     html! {
         <StockTable<KrobusImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />

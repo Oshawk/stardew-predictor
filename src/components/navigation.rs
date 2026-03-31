@@ -12,7 +12,7 @@ pub struct NavigationProperties {
     pub disabled: bool,
 }
 
-#[function_component]
+#[component]
 pub fn Navigation(properties: &NavigationProperties) -> Html {
     let backward_button_updated: Callback<MouseEvent> = {
         let updated: Callback<NavigationDirection> = properties.updated.clone();

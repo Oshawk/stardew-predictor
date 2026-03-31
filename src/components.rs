@@ -1,7 +1,6 @@
 pub mod button;
 pub mod configuration_form;
 pub mod date;
-pub mod date_jump;
 pub mod dropdown;
 pub mod filter;
 pub mod input;

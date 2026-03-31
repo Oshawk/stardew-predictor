@@ -3,7 +3,7 @@ use std::cmp::max;
 use anyhow::Result;
 use yew::prelude::*;
 
-use crate::components::date_jump::DateJump;
+use crate::components::date::DateJump;
 use crate::components::filter::Filter;
 use crate::components::message::{Message, MessageColour};
 use crate::components::navigation::{Navigation, NavigationDirection};
@@ -15,26 +15,26 @@ pub fn stock_items_table_header() -> Vec<Vec<TableCell>> {
         TableCell {
             value: TableValue::String(AttrValue::from("Date")),
             align: TableAlign::MiddleLeft,
-            rows: 1u8,
-            columns: 1u8,
+            rows: 1,
+            columns: 1,
         },
         TableCell {
             value: TableValue::String(AttrValue::from("Item")),
             align: TableAlign::MiddleLeft,
-            rows: 1u8,
-            columns: 2u8,
+            rows: 1,
+            columns: 2,
         },
         TableCell {
             value: TableValue::String(AttrValue::from("Price")),
             align: TableAlign::MiddleLeft,
-            rows: 1u8,
-            columns: 1u8,
+            rows: 1,
+            columns: 1,
         },
         TableCell {
             value: TableValue::String(AttrValue::from("Quantity")),
             align: TableAlign::MiddleLeft,
-            rows: 1u8,
-            columns: 1u8,
+            rows: 1,
+            columns: 1,
         },
     ]]
 }
@@ -55,37 +55,35 @@ pub struct StockTableProperties {
     pub navigation_step: i32,
 }
 
-#[function_component]
+#[component]
 pub fn StockTable<T: StockTableTrait>(properties: &StockTableProperties) -> Html {
-    let date: UseStateHandle<i32> = use_state_eq(|| properties.configuration.date.unwrap_or(1i32));
-    let filter: UseStateHandle<String> = use_state_eq(|| "".to_string());
+    let date = use_state_eq(|| properties.configuration.date.unwrap_or(1));
+    let filter = use_state_eq(|| String::new());
 
-    let date_jump_updated: Callback<i32> =
-        use_callback(date.clone(), |date_: i32, date: &UseStateHandle<i32>| {
-            date.set(date_);
-        });
+    let date_jump_updated = {
+        let date = date.clone();
+        Callback::from(move |value: i32| date.set(value))
+    };
 
-    let filter_updated: Callback<String> = use_callback(
-        filter.clone(),
-        |filter_: String, filter: &UseStateHandle<String>| {
-            filter.set(filter_);
-        },
-    );
+    let filter_updated = {
+        let filter = filter.clone();
+        Callback::from(move |value: String| filter.set(value))
+    };
 
-    let navigation_step: i32 = properties.navigation_step;
-    let navigation_updated: Callback<NavigationDirection> = use_callback(
-        date.clone(),
-        move |direction: NavigationDirection, date: &UseStateHandle<i32>| match direction {
+    let navigation_step = properties.navigation_step;
+    let navigation_updated = {
+        let date = date.clone();
+        Callback::from(move |direction: NavigationDirection| match direction {
             NavigationDirection::Backward => {
-                date.set(max(**date - navigation_step, 1i32));
+                date.set(max(*date - navigation_step, 1));
             }
             NavigationDirection::Forward => {
-                date.set(**date + navigation_step);
+                date.set(*date + navigation_step);
             }
-        },
-    );
+        })
+    };
 
-    match T::get_stock(&properties.configuration, *date, &*filter) {
+    match T::get_stock(&properties.configuration, *date, &filter) {
         Ok(table) => {
             html!(
                 <>

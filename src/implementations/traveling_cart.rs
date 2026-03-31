@@ -246,7 +246,7 @@ pub struct TravelingCartProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn TravelingCart(properties: &TravelingCartProperties) -> Html {
     html! {
         <StockTable<TravelingCartImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />

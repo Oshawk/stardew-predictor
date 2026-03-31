@@ -11,30 +11,26 @@ use crate::implementations::sandy::Sandy;
 use crate::implementations::traveling_cart::TravelingCart;
 use crate::implementations::util::Implementation;
 
-#[function_component]
+#[component]
 pub fn App() -> Html {
-    let configuration: UseStateHandle<Option<Configuration>> = use_state_eq(|| None);
-    let implementation: UseStateHandle<Option<Implementation>> = use_state_eq(|| None);
+    let configuration = use_state_eq(|| None::<Configuration>);
+    let implementation = use_state_eq(|| None::<Implementation>);
 
-    let configuration_updated: Callback<Configuration> = use_callback(
-        (configuration.clone(), implementation.clone()),
-        move |configuration_: Configuration,
-              (configuration, implementation): &(
-            UseStateHandle<Option<Configuration>>,
-            UseStateHandle<Option<Implementation>>,
-        )| {
-            configuration.set(Some(configuration_));
-            implementation.set(None); // Resetting the tabs when "Go" is clicked means that all implementatiosn will be created a.new.
-        },
-    );
+    let configuration_updated = {
+        let configuration = configuration.clone();
+        let implementation = implementation.clone();
+        Callback::from(move |config: Configuration| {
+            configuration.set(Some(config));
+            implementation.set(None); // Reset tabs so all implementations are created fresh.
+        })
+    };
 
-    let implementation_updated: Callback<Implementation> = use_callback(
-        implementation.clone(),
-        move |implementation_: Implementation,
-              implementation: &UseStateHandle<Option<Implementation>>| {
-            implementation.set(Some(implementation_));
-        },
-    );
+    let implementation_updated = {
+        let implementation = implementation.clone();
+        Callback::from(move |impl_: Implementation| {
+            implementation.set(Some(impl_));
+        })
+    };
 
     html!(
         <>

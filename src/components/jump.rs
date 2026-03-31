@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use std::str::FromStr;
 
 use web_sys::HtmlInputElement;
@@ -12,44 +10,49 @@ pub struct JumpProperties<T: Copy + FromStr + PartialEq + ToString + 'static> {
     pub label: AttrValue,
 }
 
-#[function_component]
+#[component]
 pub fn Jump<T: Copy + FromStr + PartialEq + ToString + 'static>(
     properties: &JumpProperties<T>,
 ) -> Html {
-    let force_update: UseForceUpdateHandle = use_force_update();
+    let text = use_state(|| String::new());
+    let parsed = use_state(|| None::<T>);
 
-    let value: Rc<RefCell<Option<T>>> = use_mut_ref(|| None);
-    let value_updated: Callback<InputEvent> = {
-        let force_update: UseForceUpdateHandle = force_update.clone();
-        let value: Rc<RefCell<Option<T>>> = value.clone();
+    let value_updated = {
+        let text = text.clone();
+        let parsed = parsed.clone();
         Callback::from(move |event: InputEvent| {
-            let value_string: String = event.target_unchecked_into::<HtmlInputElement>().value();
-            match value_string.parse::<T>() {
-                Ok(value_) => {
-                    *value.borrow_mut() = Some(value_);
+            let input = event.target_unchecked_into::<HtmlInputElement>().value();
+            match input.parse::<T>() {
+                Ok(value) => {
+                    parsed.set(Some(value));
+                    text.set(input);
                 }
                 Err(_) => {
-                    *value.borrow_mut() = None;
-                    if value_string != "-" {
-                        force_update.force_update();
+                    parsed.set(None);
+                    if input == "-" {
+                        text.set(input);
+                    } else {
+                        text.set(String::new());
                     }
                 }
             }
         })
     };
 
-    let jump_updated: Callback<MouseEvent> = {
-        let updated: Callback<T> = properties.updated.clone();
-        Callback::from(move |_: MouseEvent| match *value.borrow() {
-            Some(value) => updated.emit(value),
-            None => {}
+    let jump_updated = {
+        let parsed = parsed.clone();
+        let updated = properties.updated.clone();
+        Callback::from(move |_: MouseEvent| {
+            if let Some(value) = *parsed {
+                updated.emit(value);
+            }
         })
     };
 
     html!(
         <div class="field has-addons">
             <div class="control is-expanded">
-                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value="" />
+                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value={ (*text).clone() } />
             </div>
             <div class="control">
                 <button class="button is-primary" onclick={ jump_updated }>{ "Jump" }</button>

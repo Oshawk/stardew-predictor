@@ -52,7 +52,7 @@ pub struct ButtonProperties {
     pub label: AttrValue,
 }
 
-#[function_component]
+#[component]
 pub fn Button(properties: &ButtonProperties) -> Html {
     let button_updated: Callback<MouseEvent> = {
         let updated: Callback<()> = properties.updated.clone();

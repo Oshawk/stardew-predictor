@@ -6,7 +6,7 @@ pub struct FilterProperties {
     pub updated: Callback<String>,
 }
 
-#[function_component]
+#[component]
 pub fn Filter(properties: &FilterProperties) -> Html {
     let value: UseStateHandle<String> = use_state_eq(|| "".to_string());
 

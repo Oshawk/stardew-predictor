@@ -93,7 +93,7 @@ pub struct SandyProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn Sandy(properties: &SandyProperties) -> Html {
     html! {
         <StockTable<SandyImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />

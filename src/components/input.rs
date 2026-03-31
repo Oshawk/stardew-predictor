@@ -10,24 +10,29 @@ pub struct InputProperties<T: Copy + FromStr + PartialEq + ToString + 'static> {
     pub label: AttrValue,
 }
 
-#[function_component]
+#[component]
 pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(
     properties: &InputProperties<T>,
 ) -> Html {
-    let value: UseForceUpdateHandle = use_force_update();
-    let value_updated: Callback<InputEvent> = {
-        let value: UseForceUpdateHandle = value.clone();
-        let updated: Callback<Option<T>> = properties.updated.clone();
+    let text = use_state(|| String::new());
+
+    let value_updated = {
+        let text = text.clone();
+        let updated = properties.updated.clone();
         Callback::from(move |event: InputEvent| {
-            let value_string: String = event.target_unchecked_into::<HtmlInputElement>().value();
-            match value_string.parse::<T>() {
-                Ok(value_) => {
-                    updated.emit(Some(value_));
+            let input = event.target_unchecked_into::<HtmlInputElement>().value();
+            match input.parse::<T>() {
+                Ok(value) => {
+                    updated.emit(Some(value));
+                    text.set(input);
                 }
                 Err(_) => {
                     updated.emit(None);
-                    if value_string != "-" {
-                        value.force_update();
+                    // Allow typing "-" for negative numbers without resetting
+                    if input == "-" {
+                        text.set(input);
+                    } else {
+                        text.set(String::new());
                     }
                 }
             }
@@ -38,7 +43,7 @@ pub fn Input<T: Copy + FromStr + PartialEq + ToString + 'static>(
         <div class="field">
             <label class="label">{ properties.label.clone() }</label>
             <div class="control">
-                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value="" />
+                <input class="input" oninput={ value_updated } placeholder={ properties.label.clone() } type="text" value={ (*text).clone() } />
             </div>
         </div>
     )

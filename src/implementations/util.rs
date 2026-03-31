@@ -186,7 +186,7 @@ pub fn season_name(date: i32) -> &'static str {
         0u8 => "Spring",
         1u8 => "Summer",
         2u8 => "Fall",
-        3u8 => "Winder",
+        3u8 => "Winter",
         _ => panic!(),
     }
 }

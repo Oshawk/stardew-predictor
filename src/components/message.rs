@@ -51,7 +51,7 @@ pub struct MessageProperties {
     pub body: Option<AttrValue>,
 }
 
-#[function_component]
+#[component]
 pub fn Message(properties: &MessageProperties) -> Html {
     html!(
         <article class={ classes!("message", properties.colour.to_string()) }>

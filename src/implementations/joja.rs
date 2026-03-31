@@ -92,7 +92,7 @@ pub struct JojaProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn Joja(properties: &JojaProperties) -> Html {
     html! {
         <StockTable<JojaImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />

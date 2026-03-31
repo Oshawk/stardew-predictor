@@ -1,97 +1,79 @@
 use web_sys::{HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
 
+fn compute_date(year: Option<u16>, season: Option<u8>, day: Option<u8>) -> Option<i32> {
+    match (year, season, day) {
+        (Some(year), Some(season), Some(day)) => {
+            Some((year as i32 - 1) * 112 + (season as i32 - 1) * 28 + day as i32)
+        }
+        _ => None,
+    }
+}
+
+/// Continuous date picker: emits `Option<i32>` on every field change.
 #[derive(Properties, PartialEq)]
-pub struct DateProperties {
+pub struct DatePickerProperties {
     pub updated: Callback<Option<i32>>,
-    #[prop_or(AttrValue::from("Input"))]
+    #[prop_or(AttrValue::from("Date"))]
     pub label: AttrValue,
 }
 
-#[function_component]
-pub fn Date(properties: &DateProperties) -> Html {
-    let year: UseStateHandle<Option<u16>> = use_state(|| None);
-    let season: UseStateHandle<Option<u8>> = use_state(|| None);
-    let day: UseStateHandle<Option<u8>> = use_state(|| None);
+#[component]
+pub fn DatePicker(properties: &DatePickerProperties) -> Html {
+    let year = use_state(|| None::<u16>);
+    let season = use_state(|| None::<u8>);
+    let day = use_state(|| None::<u8>);
 
-    let any_updated = {
-        let updated: Callback<Option<i32>> = properties.updated.clone();
-        let year: UseStateHandle<Option<u16>> = year.clone();
-        let season: UseStateHandle<Option<u8>> = season.clone();
-        let day: UseStateHandle<Option<u8>> = day.clone();
-        move || match (*year, *season, *day) {
-            (Some(year), Some(season), Some(day)) => {
-                updated.emit(Some(
-                    (year as i32 - 1i32) * 112i32 + (season as i32 - 1i32) * 28 + day as i32,
-                ));
-            }
-            _ => {
-                updated.emit(None);
-            }
-        }
-    };
-
-    let year_updated: Callback<InputEvent> = {
-        let year: UseStateHandle<Option<u16>> = year.clone();
-        let any_updated = any_updated.clone();
+    let year_updated = {
+        let year = year.clone();
+        let season = season.clone();
+        let day = day.clone();
+        let updated = properties.updated.clone();
         Callback::from(move |event: InputEvent| {
-            match event
+            let new_year = event
                 .target_unchecked_into::<HtmlInputElement>()
                 .value()
                 .parse::<u16>()
-            {
-                Ok(year_) => {
-                    if year_ > 0u16 {
-                        year.set(Some(year_));
-                    } else {
-                        year.set(None);
-                    }
-                }
-                Err(_) => {
-                    year.set(None);
-                }
-            }
-            any_updated();
+                .ok()
+                .filter(|&y| y > 0);
+            year.set(new_year);
+            updated.emit(compute_date(new_year, *season, *day));
         })
     };
 
-    let season_updated: Callback<Event> = {
-        let season: UseStateHandle<Option<u8>> = season.clone();
-        let any_updated = any_updated.clone();
+    let season_updated = {
+        let year = year.clone();
+        let season = season.clone();
+        let day = day.clone();
+        let updated = properties.updated.clone();
         Callback::from(move |event: Event| {
-            let season_: i32 = event
+            let index = event
                 .target_unchecked_into::<HtmlSelectElement>()
                 .selected_index();
-            if (1i32..=4i32).contains(&season_) {
-                season.set(Some(season_ as u8));
+            let new_season = if (1..=4).contains(&index) {
+                Some(index as u8)
             } else {
-                season.set(None);
-            }
-            any_updated();
+                None
+            };
+            season.set(new_season);
+            updated.emit(compute_date(*year, new_season, *day));
         })
     };
 
-    let day_updated: Callback<InputEvent> = {
-        let day: UseStateHandle<Option<u8>> = day.clone();
-        let any_updated = any_updated.clone();
+    let day_updated = {
+        let year = year.clone();
+        let season = season.clone();
+        let day = day.clone();
+        let updated = properties.updated.clone();
         Callback::from(move |event: InputEvent| {
-            match event
+            let new_day = event
                 .target_unchecked_into::<HtmlInputElement>()
                 .value()
                 .parse::<u8>()
-            {
-                Ok(day_) => {
-                    if (1u8..=28u8).contains(&day_) {
-                        day.set(Some(day_));
-                    } else {
-                        day.set(None);
-                    }
-                }
-                Err(_) => {
-                    day.set(None);
-                }
-            }
-            any_updated();
+                .ok()
+                .filter(|&d| (1..=28).contains(&d));
+            day.set(new_day);
+            updated.emit(compute_date(*year, *season, new_day));
         })
     };
 
@@ -101,23 +83,115 @@ pub fn Date(properties: &DateProperties) -> Html {
             <div class="control">
                 <div class="field has-addons">
                     <div class="control is-expanded">
-                        <input class="input" oninput={ day_updated } placeholder="Day" type="text" value={ match *day { Some (day) => { day.to_string() }, None => { "".to_string() } } } />
+                        <input class="input" oninput={ day_updated } placeholder="Day" type="text" value={ day.map(|d| d.to_string()).unwrap_or_default() } />
                     </div>
                     <div class="control">
                         <div class="select">
                             <select onchange={ season_updated }>
-                                <option disabled=true hidden=true selected={ season.unwrap_or(0u8) == 0u8 }>{ "Season" }</option>
-                                <option selected={ season.unwrap_or(0u8) == 1u8 }>{ "Spring" }</option>
-                                <option selected={ season.unwrap_or(0u8) == 2u8 }>{ "Summer" }</option>
-                                <option selected={ season.unwrap_or(0u8) == 3u8 }>{ "Fall" }</option>
-                                <option selected={ season.unwrap_or(0u8) == 4u8 }>{ "Winter" }</option>
+                                <option disabled=true hidden=true selected={ season.unwrap_or(0) == 0 }>{ "Season" }</option>
+                                <option selected={ season.unwrap_or(0) == 1 }>{ "Spring" }</option>
+                                <option selected={ season.unwrap_or(0) == 2 }>{ "Summer" }</option>
+                                <option selected={ season.unwrap_or(0) == 3 }>{ "Fall" }</option>
+                                <option selected={ season.unwrap_or(0) == 4 }>{ "Winter" }</option>
                             </select>
                         </div>
                     </div>
                     <div class="control is-expanded">
-                        <input class="input" oninput={ year_updated } placeholder="Year" type="text" value={ match *year { Some (year) => { year.to_string() }, None => { "".to_string() } } } />
+                        <input class="input" oninput={ year_updated } placeholder="Year" type="text" value={ year.map(|y| y.to_string()).unwrap_or_default() } />
                     </div>
                 </div>
+            </div>
+        </div>
+    }
+}
+
+/// Date jump: shows a "Jump" button, emits `i32` only on click.
+#[derive(Properties, PartialEq)]
+pub struct DateJumpProperties {
+    pub updated: Callback<i32>,
+}
+
+#[component]
+pub fn DateJump(properties: &DateJumpProperties) -> Html {
+    let year = use_state(|| None::<u16>);
+    let season = use_state(|| None::<u8>);
+    let day = use_state(|| None::<u8>);
+
+    let year_updated = {
+        let year = year.clone();
+        Callback::from(move |event: InputEvent| {
+            year.set(
+                event
+                    .target_unchecked_into::<HtmlInputElement>()
+                    .value()
+                    .parse::<u16>()
+                    .ok()
+                    .filter(|&y| y > 0),
+            );
+        })
+    };
+
+    let season_updated = {
+        let season = season.clone();
+        Callback::from(move |event: Event| {
+            let index = event
+                .target_unchecked_into::<HtmlSelectElement>()
+                .selected_index();
+            season.set(if (1..=4).contains(&index) {
+                Some(index as u8)
+            } else {
+                None
+            });
+        })
+    };
+
+    let day_updated = {
+        let day = day.clone();
+        Callback::from(move |event: InputEvent| {
+            day.set(
+                event
+                    .target_unchecked_into::<HtmlInputElement>()
+                    .value()
+                    .parse::<u8>()
+                    .ok()
+                    .filter(|&d| (1..=28).contains(&d)),
+            );
+        })
+    };
+
+    let jump_updated = {
+        let year = year.clone();
+        let season = season.clone();
+        let day = day.clone();
+        let updated = properties.updated.clone();
+        Callback::from(move |_: MouseEvent| {
+            if let Some(date) = compute_date(*year, *season, *day) {
+                updated.emit(date);
+            }
+        })
+    };
+
+    html! {
+        <div class="field has-addons">
+            <div class="control is-expanded">
+                <input class="input" oninput={ day_updated } placeholder="Day" type="text" value={ day.map(|d| d.to_string()).unwrap_or_default() } />
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select onchange={ season_updated }>
+                        <option disabled=true hidden=true selected={ season.unwrap_or(0) == 0 }>{ "Season" }</option>
+                        <option selected={ season.unwrap_or(0) == 1 }>{ "Spring" }</option>
+                        <option selected={ season.unwrap_or(0) == 2 }>{ "Summer" }</option>
+                        <option selected={ season.unwrap_or(0) == 3 }>{ "Fall" }</option>
+                        <option selected={ season.unwrap_or(0) == 4 }>{ "Winter" }</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control is-expanded">
+                <input class="input" oninput={ year_updated } placeholder="Year" type="text" value={ year.map(|y| y.to_string()).unwrap_or_default() } />
+            </div>
+            <div class="control">
+                <button class="button is-primary" onclick={ jump_updated }>{ "Jump" }</button>
             </div>
         </div>
     }

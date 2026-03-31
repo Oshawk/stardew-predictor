@@ -90,7 +90,7 @@ pub struct PierreProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn Pierre(properties: &PierreProperties) -> Html {
     html! {
         <StockTable<PierreImpl> configuration={ properties.configuration.clone() } navigation_step={ NON_FILTER_ITERATIONS as i32 } />

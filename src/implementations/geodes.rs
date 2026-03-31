@@ -406,41 +406,34 @@ pub struct GeodesProperties {
     pub configuration: Configuration,
 }
 
-#[function_component]
+#[component]
 pub fn Geodes(properties: &GeodesProperties) -> Html {
-    let geodes_cracked: UseStateHandle<i32> =
-        use_state_eq(|| properties.configuration.geodes_cracked.unwrap_or(0u16) as i32);
-    let filter: UseStateHandle<String> = use_state_eq(|| "".to_string());
+    let geodes_cracked = use_state_eq(|| properties.configuration.geodes_cracked.unwrap_or(0u16) as i32);
+    let filter = use_state_eq(|| String::new());
 
-    let jump_updated: Callback<u16> = use_callback(
-        geodes_cracked.clone(),
-        |geodes_cracked_: u16, geodes_cracked: &UseStateHandle<i32>| {
-            geodes_cracked.set(geodes_cracked_ as i32);
-        },
-    );
+    let jump_updated = {
+        let geodes_cracked = geodes_cracked.clone();
+        Callback::from(move |value: u16| geodes_cracked.set(value as i32))
+    };
 
-    let filter_updated: Callback<String> = use_callback(
-        filter.clone(),
-        |filter_: String, filter: &UseStateHandle<String>| {
-            filter.set(filter_);
-        },
-    );
+    let filter_updated = {
+        let filter = filter.clone();
+        Callback::from(move |value: String| filter.set(value))
+    };
 
-    let navigation_updated: Callback<NavigationDirection> = use_callback(
-        geodes_cracked.clone(),
-        move |direction: NavigationDirection, geodes_cracked: &UseStateHandle<i32>| {
-            match direction {
-                NavigationDirection::Backward => {
-                    geodes_cracked.set(max(**geodes_cracked - NON_FILTER_ITERATIONS as i32, 0i32));
-                }
-                NavigationDirection::Forward => {
-                    geodes_cracked.set(**geodes_cracked + NON_FILTER_ITERATIONS as i32);
-                }
-            };
-        },
-    );
+    let navigation_updated = {
+        let geodes_cracked = geodes_cracked.clone();
+        Callback::from(move |direction: NavigationDirection| match direction {
+            NavigationDirection::Backward => {
+                geodes_cracked.set(max(*geodes_cracked - NON_FILTER_ITERATIONS as i32, 0));
+            }
+            NavigationDirection::Forward => {
+                geodes_cracked.set(*geodes_cracked + NON_FILTER_ITERATIONS as i32);
+            }
+        })
+    };
 
-    match get_geodes(&properties.configuration, *geodes_cracked, &*filter) {
+    match get_geodes(&properties.configuration, *geodes_cracked, &filter) {
         Ok(table) => {
             html!(
                 <>

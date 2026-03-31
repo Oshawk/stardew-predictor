@@ -10,13 +10,13 @@ pub enum TableValue {
     Sprite(AttrValue, u16, u16, u16, u16, u16, u16),
 }
 
-impl ToHtml for TableValue {
-    fn to_html(&self) -> Html {
+impl TableValue {
+    pub fn to_html(&self) -> Html {
         match self {
             TableValue::None => html!(),
             TableValue::String(string) => html!({ string }),
             TableValue::Sprite(image, x, y, width, height, sheet_width, sheet_height) => html!(
-                <figure class={ format!("image") } style={ format!("background: url(./assets/{image}) calc(-{x}px * ({SPRITE_HEIGHT} / {height})) calc(-{y}px * ({SPRITE_HEIGHT} / {height})) / calc({sheet_width}px * ({SPRITE_HEIGHT} / {height})) calc({sheet_height}px * ({SPRITE_HEIGHT} / {height})); width: calc({width}px * ({SPRITE_HEIGHT} / {height})); height: calc({height}px * ({SPRITE_HEIGHT} / {height})); image-rendering: pixelated; display: inline-block;") } />
+                <figure class="image" style={ format!("background: url(./assets/{image}) calc(-{x}px * ({SPRITE_HEIGHT} / {height})) calc(-{y}px * ({SPRITE_HEIGHT} / {height})) / calc({sheet_width}px * ({SPRITE_HEIGHT} / {height})) calc({sheet_height}px * ({SPRITE_HEIGHT} / {height})); width: calc({width}px * ({SPRITE_HEIGHT} / {height})); height: calc({height}px * ({SPRITE_HEIGHT} / {height})); image-rendering: pixelated; display: inline-block;") } />
             ),
         }
     }
@@ -69,44 +69,28 @@ pub struct TableProperties {
     pub body: Vec<Vec<TableCell>>,
 }
 
-#[function_component]
+#[component]
 pub fn Table(properties: &TableProperties) -> Html {
     html!(
         <div style="overflow-x: scroll;">
             <table class="table is-fullwidth">
                 <thead>
-                    {
-                        properties.header.iter().map(|row|{
-                            html!(
-                                <tr>
-                                    {
-                                        row.iter().map(|cell|{
-                                            html!(
-                                                <th style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</th>
-                                            )
-                                        }).collect::<Html>()
-                                    }
-                                </tr>
-                            )
-                        }).collect::<Html>()
-                    }
+                    { for properties.header.iter().map(|row| html!(
+                        <tr>
+                            { for row.iter().map(|cell| html!(
+                                <th style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ cell.value.to_html() }</th>
+                            ))}
+                        </tr>
+                    ))}
                 </thead>
                 <tbody>
-                    {
-                        properties.body.iter().map(|row|{
-                            html!(
-                                <tr>
-                                    {
-                                        row.iter().map(|cell|{
-                                            html!(
-                                                <td style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ &cell.value }</td>
-                                            )
-                                        }).collect::<Html>()
-                                    }
-                                </tr>
-                            )
-                        }).collect::<Html>()
-                    }
+                    { for properties.body.iter().map(|row| html!(
+                        <tr>
+                            { for row.iter().map(|cell| html!(
+                                <td style={ cell.align.to_string() } rowspan={ cell.rows.to_string() } colspan={ cell.columns.to_string() }>{ cell.value.to_html() }</td>
+                            ))}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>

@@ -298,9 +298,13 @@ fn load<T: Debug + FromValueSplit>(
         );
     }
 
+    let entries: Vec<(u16, String)> = map
+        .iter()
+        .map(|(key, value)| (*key, format!("{:?}", value)))
+        .collect();
     let mut builder: phf_codegen::Map<u16> = phf_codegen::Map::new();
-    for (key, value) in &map {
-        builder.entry(*key, format!("{:?}", value).as_str());
+    for (key, value) in &entries {
+        builder.entry(*key, value);
     }
 
     writeln!(
